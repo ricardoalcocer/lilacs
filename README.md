@@ -25,7 +25,7 @@ When adding records, each will be part of a data collection, which is specified 
 
 ### Add Records
 
-/collection_name/set
+/api/collection_name/set
 
 Requires data POSTed via HTTP
 
@@ -37,12 +37,12 @@ Requires data POSTed via HTTP
 
 **Get all records in collection**
 
-/collection_name/get
+/api/collection_name/get
 
 **Get records sorted (proposed)**
 
-/collection_name/get-sorted/sort_column
+/api/collection_name/get-sorted/sort_column
 
 **Get a specific record (proposed)**
 
-/collection_name/get/524c50c5568aa70b2001dd44
+/api/collection_name/get/524c50c5568aa70b2001dd44
