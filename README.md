@@ -3,7 +3,8 @@
 Li'l ACS is a combiantion of Node.ACS (to expose an API) + ACS (as a data store), that will provide you with an instant API for you mobile or web app.
 
 ## Installation
-LilACS is designed with simplicity in mind.  The steps to get LilACS are:
+
+The steps to get LilACS are:
 
 1. Install ACS if you don't already have it: **[sudo] npm install acs -g**
 2. Login to ACS: **acs login**
@@ -16,7 +17,7 @@ LilACS is designed with simplicity in mind.  The steps to get LilACS are:
 
 
 ## Usage
-Once you have LilACS running, your backend is ready to start receiving requests at http://your_domain/api/xxxxx.  When testing, ACS will give you the local URL and port.  When published, ACS also gives you a URL, but you can assign a CNAME to an existing domain and point it to your NodeACS app.  
+LilACS is designed with simplicity in mind.  Once you have LilACS running, your backend is ready to start receiving requests at http://your_domain/api/xxxxx.  When testing, ACS will give you the local URL and port.  When published, ACS also gives you a URL, but you can assign a CNAME to an existing domain and point it to your NodeACS app.  
 
 When adding records, each will be part of a data collection, which is specified at the moment of posting it.  Right after adding your first record, a full REST API will be exposed to you to manage the data.
 
