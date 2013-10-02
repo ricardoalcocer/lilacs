@@ -65,8 +65,8 @@ function start(app, express) {
 					// I'm using try catch just to make sure I can parse the object
 					try{
 						// should get data via POST
-						var collectionName=req.body.collectionName;
-						var objectToAdd=req.body.objectToAdd;
+						var collectionName=req.body.collection;
+						var objectToAdd=req.body.data;
 						var objectToAdd=JSON.parse(objectToAdd);
 						//	
 					}catch(e){

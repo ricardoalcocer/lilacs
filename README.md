@@ -26,24 +26,15 @@ When adding records, each will be part of a data collection, which is specified 
 
 ### Add Records
 
-/api/collection_name/set
+| API Call        				 | Method | Description           | Status  |
+| ------------- 				 | -- |--         | -- |
+| /api/collection_name/set      | `POST` | Receives variables collection and data         | Implemented |
+| /api/collection_name/get      | `GET` | Returns a JSON array with all records in specified collection         | Implemented |
+| /api/collection_name/get/rec_id      | `GET` | Returns specified record as a JSON string         | Proposed |
+| /api/collection_name/get-sorted/sort_column      | `GET` | Returns a JSON array with all records in collection sorted by the specified key         | Proposed |
+| /api/collection_name/edit/rec_id      | `POST` | Receives variable **data** as JSON string         | Proposed |
+| /api/collection_name/delete/      | `POST` | Deletes rec_id         | Proposed |
 
-Requires data POSTed via HTTP
 
-* **collectionName** - Name of the data collection.  If is new it will be created.  If existing, record will be added to existing collection.
-* **objectToAdd** - JavaScript object to add to collection
+### That's that
 
-
-### Get Records
-
-**Get all records in collection**
-
-/api/collection_name/get
-
-**Get records sorted (proposed)**
-
-/api/collection_name/get-sorted/sort_column
-
-**Get a specific record (proposed)**
-
-/api/collection_name/get/524c50c5568aa70b2001dd44
