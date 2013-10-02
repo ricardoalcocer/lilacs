@@ -26,15 +26,51 @@ When adding records, each will be part of a data collection, which is specified 
 
 ### Add Records
 
-| API Call        				 | Method | Description           | Status  |
-| ------------- 				 | -- |--         | -- |
-| /api/collection_name/set      | `POST` | Receives variables collection and data         | Implemented |
-| /api/collection_name/get      | `GET` | Returns a JSON array with all records in specified collection         | Implemented |
-| /api/collection_name/get/rec_id      | `GET` | Returns specified record as a JSON string         | Proposed |
-| /api/collection_name/get-sorted/sort_column      | `GET` | Returns a JSON array with all records in collection sorted by the specified key         | Proposed |
-| /api/collection_name/edit/rec_id      | `POST` | Receives variable **data** as JSON string         | Proposed |
-| /api/collection_name/delete/      | `POST` | Deletes rec_id         | Proposed |
+<table>
+    <tr>
+        <td><b>API Call</b></td>
+        <td><b>Method</b></td>
+        <td><b>Description</b></td>
+        <td><b>Status</b></td>
+    </tr>
+        <tr>
+        <td>/api/collection_name/set</td>
+        <td align="center">POST</td>
+        <td>Receives variables collection and data</td>
+        <td align="center">Implemented</td>
+    </tr>
+        <tr>
+        <td>/api/collection_name/get</td>
+        <td align="center">GET</td>
+        <td>Returns a JSON array with all records in specified collection </td>
+        <td align="center">Implemented</td>
+    </tr>
+        <tr>
+        <td>/api/collection_name/get/rec_id</td>
+        <td align="center">GET</td>
+        <td>Returns specified record as a JSON string</td>
+        <td align="center">Proposed</td>
+    </tr>
+        <tr>
+        <td>/api/collection_name/get-sorted/sort_column</td>
+        <td align="center">GET</td>
+        <td>Returns a JSON array with all records in collection sorted by the specified key</td>
+        <td align="center">Proposed</td>
+    </tr>
+        <tr>
+        <td>/api/collection_name/edit/rec_id</td>
+        <td align="center">POST</td>
+        <td>Receives variable **data** as JSON string</td>
+        <td align="center">Proposed</td>
+    </tr>
+        <tr>
+        <td>/api/collection_name/delete/</td>
+        <td align="center">POST</td>
+        <td>Deletes rec_id</td>
+        <td align="center">Proposed</td>
+    </tr>
+</table>
 
 
-### That's that
+### That's that for now
 
