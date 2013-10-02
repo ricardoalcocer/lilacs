@@ -49,13 +49,13 @@ When adding records, each will be part of a data collection, which is specified 
         <td>/api/collection_name/get/rec_id</td>
         <td align="center">GET</td>
         <td>Returns specified record as a JSON string</td>
-        <td align="center">Proposed</td>
+        <td align="center">Implemented</td>
     </tr>
         <tr>
         <td>/api/collection_name/get-sorted/sort_column</td>
         <td align="center">GET</td>
         <td>Returns a JSON array with all records in collection sorted by the specified key</td>
-        <td align="center">Proposed</td>
+        <td align="center">Impelmented</td>
     </tr>
         <tr>
         <td>/api/collection_name/edit/rec_id</td>

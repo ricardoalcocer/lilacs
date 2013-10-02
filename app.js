@@ -10,6 +10,9 @@ function start(app, express) {
 	app.use(express.session({ key: 'node.acs', secret: ACS_SECRET }));
 	ACS.init(ACS_KEY,ACS_SECRET);
 
+	// any request going to /api/* will go through here.  Every other will be handled by express
+
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	// catch all route for HTTP GET 
 	app.get('/api/*', function(req, res, next){
 		res.setHeader('Content-Type', 'application/json');
@@ -19,18 +22,46 @@ function start(app, express) {
 			// get arguments from query string
 			collectionName=fullPath[2].toLowerCase();
 			action=fullPath[3];
+			extraParam=fullPath[4] || null;
 
 			switch(action.toUpperCase()){
 				case 'GET':
-					// could receive extra URL parameters for sorting, paging, etc.
-					// need to define this
-					ACS.Objects.query({
-						classname:collectionName,
-						order: 'name'
-					},function(e){
-						var outData=e[collectionName];
-						res.send(JSON.stringify(outData));
-					})
+					// if there's exacly a position [4] in the array, then that's the record to get
+					// otherwise it means get all
+
+					if (extraParam !== null){
+						ACS.Objects.query({
+							classname:collectionName,
+							order: 'name',
+							where:{
+								id: extraParam
+							}
+						},function(e){
+							var outData=e[collectionName];
+							res.send(JSON.stringify(outData));
+						})	
+					}else{
+						ACS.Objects.query({
+							classname:collectionName,
+							order: 'name'
+						},function(e){
+							var outData=e[collectionName];
+							res.send(JSON.stringify(outData));
+						})
+					}
+					break;
+				case 'GET-SORTED':
+					if (extraParam !== null){
+						ACS.Objects.query({
+							classname:collectionName,
+							order: extraParam
+						},function(e){
+							var outData=e[collectionName];
+							res.send(JSON.stringify(outData));
+						})	
+					}else{
+						res.send({message:'Need to provide sort column'});	
+					}
 					break;
 				default:
 					res.send({message:'Wrong action'});
@@ -40,6 +71,7 @@ function start(app, express) {
 		}
 	});
 
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	// catch all route for HTTP POST
 	app.post('/api/*', function(req, res, next){
 		res.setHeader('Content-Type', 'application/json');
@@ -94,7 +126,7 @@ function start(app, express) {
 					//
 					break;
 
-				case "UPDATE":
+				case "EDIT":
 					// should get data via POST
 					break;
 
