@@ -52,7 +52,7 @@ When adding records, each will be part of a data collection, which is specified 
     <tr>
         <td>/api/collection_name/set</td>
         <td align="center">POST</td>
-        <td>Receives variables collection and data</td>
+        <td>Receives variable <b>data</b> holding a JSON object to insert</td>
         <td align="center">Implemented</td>
     </tr>
     <tr>
