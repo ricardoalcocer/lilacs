@@ -16,13 +16,13 @@ function start(app, express) {
 	// catch all route for HTTP GET 
 	app.get('/api/*', function(req, res, next){
 		res.setHeader('Content-Type', 'application/json');
-		var fullPath=req.path.replace(/\/$/,'').split('/');
+		var fullPath=req.path.replace(/^\/|\/$/g,'').split('/');
 
-		if (fullPath.length >=4){
+		if (fullPath.length >=3){
 			// get arguments from query string
-			collectionName=fullPath[2].toLowerCase();
-			action=fullPath[3];
-			extraParam=fullPath[4] || null;
+			collectionName=fullPath[1].toLowerCase();
+			action=fullPath[2];
+			extraParam=fullPath[3] || null;
 
 			switch(action.toUpperCase()){
 				case 'GET':
@@ -77,10 +77,10 @@ function start(app, express) {
 		res.setHeader('Content-Type', 'application/json');
 		var fullPath=req.path.replace(/\/$/,'').split('/');
 
-		if (fullPath.length >=4){
+		if (fullPath.length >=3){
 			// get arguments from query string
-			collectionName=fullPath[2].toLowerCase();
-			action=fullPath[3];
+			collectionName=fullPath[1].toLowerCase();
+			action=fullPath[2];
 
 			// react accordingly
 			switch(action.toUpperCase()){
@@ -97,7 +97,7 @@ function start(app, express) {
 					// I'm using try catch just to make sure I can parse the object
 					try{
 						// should get data via POST
-						var collectionName=req.body.collection;
+						//var collectionName=req.body.collection;
 						var objectToAdd=req.body.data;
 						var objectToAdd=JSON.parse(objectToAdd);
 						//	
