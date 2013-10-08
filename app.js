@@ -1,4 +1,6 @@
+var _ = require('lodash');
 var settings=require('/lib/lilacs.js').getSettings();
+var parseActions=require('/lib/lilacs.js').parseActions;
 
 var ACS = require('acs').ACS;
 var ACS_KEY=settings.ACS_KEY;
@@ -17,55 +19,77 @@ function start(app, express) {
 	app.get('/api/*', function(req, res, next){
 		res.setHeader('Content-Type', 'application/json');
 		var fullPath=req.path.replace(/^\/|\/$/g,'').split('/');
-
+		
 		if (fullPath.length >=3){
-			// get arguments from query string
-			collectionName=fullPath[1].toLowerCase();
-			action=fullPath[2];
-			extraParam=fullPath[3] || null;
+			var parsedActions=parseActions(fullPath);
+			
+			if (parsedActions !== null){
+				// get collection name from query string
+				collectionName=fullPath[1].toLowerCase();
 
-			switch(action.toUpperCase()){
-				case 'GET':
-					// if there's exacly a position [4] in the array, then that's the record to get
-					// otherwise it means get all
+				// get values from querystring
+				var getValue=_.find(parsedActions,{'action': 'get'}).value;
+				var orderValue=_.find(parsedActions,{'action': 'order'}).value;
+				var pageValue=_.find(parsedActions,{'action': 'page'}).value;
+				var per_pageValue=_.find(parsedActions,{'action': 'per_page'}).value;
+				var limitValue=_.find(parsedActions,{'action': 'limit'}).value;
+				var skipValue=_.find(parsedActions,{'action': 'skip'}).value;
 
-					if (extraParam !== null){
-						ACS.Objects.query({
-							classname:collectionName,
-							order: 'name',
-							where:{
-								id: extraParam
-							}
-						},function(e){
-							var outData=e[collectionName];
-							res.send(JSON.stringify(outData));
-						})	
-					}else{
-						ACS.Objects.query({
-							classname:collectionName,
-							order: 'name'
-						},function(e){
-							var outData=e[collectionName];
-							res.send(JSON.stringify(outData));
-						})
+				// create acs payload object
+				var acsPayload={};
+				acsPayload.classname=collectionName;
+
+				/*				
+				'name="foo, inc",crap,bar="baz"'.split(/(\w+\=\"[^"]*\")?\s*,/).filter(function(x){return x;})
+				this regex hack was brought to you by @cb1kenobi 
+				*/
+				
+
+				// assemble ACS Payload Object
+				if (orderValue !== null){
+					acsPayload.order=orderValue;
+				}
+				if (pageValue !== null){
+					acsPayload.page=pageValue;
+				}
+				if (per_pageValue !== null){
+					acsPayload.per_page=per_pageValue;
+				}
+				if (limitValue !== null){
+					acsPayload.limit=limitValue;
+				}
+				if (skipValue !== null){
+					acsPayload.skip=skipValue;
+				}
+
+				// if there are get parameters, then add them as a where clause
+				if (getValue.toLowerCase() !== 'all'){
+					// Now the hacky part:
+					// 
+					// I replace all commas within quotes for their HTML value and then split by commas
+					whereArray=unescape(getValue).replace(/"[^"]*"/g, function(g0){return g0.replace(/,/g,'&#44');}).split(',');
+					// this helped: http://stackoverflow.com/questions/6335264/find-comma-in-quotes-with-regex-and-replace-with-html-equiv
+		
+					getValues={};
+					whereArray.forEach(function(item){			
+						//create an object but replace the comma and remove double quotes before adding 
+						getValues[item.split('=')[0].trim()]=item.split('=')[1].replace('&#44',',').replace(/\"/g,'').trim();
+						// this helped: http://stackoverflow.com/questions/2390789/how-to-replace-all-periods-in-a-string-in-javascript
+					})
+					acsPayload.where=getValues;
+				}
+				
+				console.log(acsPayload);
+
+				// let's do this!
+				ACS.Objects.query(acsPayload,
+					function(e){
+						var outData=e[collectionName];
+						res.send(JSON.stringify(outData));
 					}
-					break;
-				case 'GET-SORTED':
-					if (extraParam !== null){
-						ACS.Objects.query({
-							classname:collectionName,
-							order: extraParam
-						},function(e){
-							var outData=e[collectionName];
-							res.send(JSON.stringify(outData));
-						})	
-					}else{
-						res.send({message:'Need to provide sort column'});	
-					}
-					break;
-				default:
-					res.send({message:'Wrong action'});
+				)			
 			}
+			
 		}else{
 			res.send({message:'Need to provide Class Name and Action'});
 		}
@@ -75,9 +99,10 @@ function start(app, express) {
 	// catch all route for HTTP POST
 	app.post('/api/*', function(req, res, next){
 		res.setHeader('Content-Type', 'application/json');
-		var fullPath=req.path.replace(/\/$/,'').split('/');
+		var fullPath=req.path.replace(/^\/|\/$/g,'').split('/');
 
 		if (fullPath.length >=3){
+			console.log(fullPath);
 			// get arguments from query string
 			collectionName=fullPath[1].toLowerCase();
 			action=fullPath[2];
@@ -147,3 +172,51 @@ function start(app, express) {
 function stop() {
 	
 }
+
+
+
+
+//			res.send(acsPayload);
+
+			/*switch(action.toUpperCase()){
+				case 'GET':
+					// if there's exacly a position [4] in the array, then that's the record to get
+					// otherwise it means get all
+
+					if (extraParam !== null){
+						ACS.Objects.query({
+							classname:collectionName,
+							order: 'name',
+							where:{
+								id: extraParam
+							}
+						},function(e){
+							var outData=e[collectionName];
+							res.send(JSON.stringify(outData));
+						})	
+					}else{
+						ACS.Objects.query({
+							classname:collectionName,
+							order: 'name'
+						},function(e){
+							var outData=e[collectionName];
+							res.send(JSON.stringify(outData));
+						})
+					}
+					break;
+				case 'GET-SORTED':
+					if (extraParam !== null){
+						ACS.Objects.query({
+							classname:collectionName,
+							order: extraParam
+						},function(e){
+							var outData=e[collectionName];
+							res.send(JSON.stringify(outData));
+						})	
+					}else{
+						res.send({message:'Need to provide sort column'});	
+					}
+					break;
+				default:
+					res.send({message:'Wrong action'});
+			}*/

@@ -40,65 +40,49 @@ LilACS is designed with simplicity in mind.  Once you have LilACS running, your 
 When adding records, each will be part of a data collection, which is specified at the moment of posting it.  Right after adding your first record, a full REST API will be exposed to you to manage the data.
 
 ## API
+** LilACS ** exposes the following arguments from the ACS 'query' method:
+
+* where (exposed as get)
+* classname
+* order
+* page
+* per_page
+* limit
+* skip
+
+There's only one simple rule to creating a LilACS URL, and that is that they are value pairs.  
+
+## Use-cases 
+
+** Get all records from employees where department='Finance' **
+
+```
+http://yourhost/api/employees/get/department='Finance'
+```
+** Get all employees ordered by name **
+
+```
+http://yourhost/api/employees/get/all/order/name
+```
+
+** Get all employees where name='Ricardo' and order by creation date descending **
+
+```
+http://yourhost/api/employees/name='Ricardo'/order/-created_at
+```
+
+** Get all employees where name='Ricardo' and department='Finance' order by creation date descending **
+
+```
+http://yourhost/api/employees/name='Ricardo',department='Finance'/order/-created_at
+```
 
 
-<table>
-    <tr>
-        <td><b>API Call</b></td>
-        <td><b>Method</b></td>
-        <td><b>Description</b></td>
-        <td><b>Status</b></td>
-    </tr>
-    <tr>
-        <td>/api/collection_name/set</td>
-        <td align="center">POST</td>
-        <td>Receives variable <b>data</b> holding a JSON object to insert</td>
-        <td align="center">Implemented</td>
-    </tr>
-    <tr>
-        <td>/api/collection_name/get</td>
-        <td align="center">GET</td>
-        <td>Returns a JSON array with all records in specified collection </td>
-        <td align="center">Implemented</td>
-    </tr>
-    <tr>
-        <td>/api/collection_name/get/rec_id</td>
-        <td align="center">GET</td>
-        <td>Returns specified record as a JSON string</td>
-        <td align="center">Implemented</td>
-    </tr>
-    <tr>
-        <td>/api/collection_name/get/field=value</td>
-        <td align="center">GET</td>
-        <td>Returns JSON array with records matching condition(s)</td>
-        <td align="center">Proposed</td>
-    </tr>
-    <tr>
-        <td>/api/collection_name/get-sorted/sort_column</td>
-        <td align="center">GET</td>
-        <td>Returns a JSON array with all records in collection sorted by the specified key</td>
-        <td align="center">Impelmented</td>
-    </tr>
-    <tr>
-        <td>/api/collection_name/get-sorted/sort_column/field=value</td>
-        <td align="center">GET</td>
-        <td>Returns a JSON array with all matching records sorted by the specified key</td>
-        <td align="center">Proposed</td>
-    </tr>
-    <tr>
-        <td>/api/collection_name/edit/rec_id</td>
-        <td align="center">POST</td>
-        <td>Receives variable **data** as JSON string</td>
-        <td align="center">Proposed</td>
-    </tr>
-    <tr>
-        <td>/api/collection_name/delete/</td>
-        <td align="center">POST</td>
-        <td>Deletes rec_id</td>
-        <td align="center">Proposed</td>
-    </tr>
-</table>
+** Pagination : Previous example, but in pages of 10 records each **
 
+```
+http://yourhost/api/employees/name='Ricardo'/order/-created_at/per_page/10/page/1
+```
 
 ### That's that for now
 
