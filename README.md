@@ -1,6 +1,11 @@
-# LilACS - Li'l ACS - Work in progress
+<center><img src="https://raw.github.com/ricardoalcocer/lilacs/master/public/images/retro_flower_1_color_colour_lilac_peace-999px.png" width="200">
 
-Li'l ACS is a combiantion of Node.ACS (to expose an API) + ACS (as a data store), that will provide you with an instant API for you mobile or web app.
+<h1>LilACS</h1>
+
+</center>
+
+
+LilACS (Li'l ACS) is a combiantion of Node.ACS (to expose an API) + ACS (as a data store), that will provide you with an instant API for you mobile or web app.
 
 ## Installation
 
@@ -42,9 +47,9 @@ When adding records, each will be part of a data collection, which is specified 
 ## API
 ** LilACS ** exposes the following arguments from the ACS 'query' method:
 
-* where (exposed as get)
-* classname
-* order
+* where (exposed as get. allows comma-separated list of value-pairs)
+* classname (exposed as the first paramenter after /api)
+* order (allows comma-separated list of columns and minus sign (-) for inverse sort order)
 * page
 * per_page
 * limit

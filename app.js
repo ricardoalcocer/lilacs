@@ -65,7 +65,7 @@ function start(app, express) {
 				// if there are get parameters, then add them as a where clause
 				if (getValue.toLowerCase() !== 'all'){
 					// Now the hacky part:
-					// 
+					
 					// I replace all commas within quotes for their HTML value and then split by commas
 					whereArray=unescape(getValue).replace(/"[^"]*"/g, function(g0){return g0.replace(/,/g,'&#44');}).split(',');
 					// this helped: http://stackoverflow.com/questions/6335264/find-comma-in-quotes-with-regex-and-replace-with-html-equiv
