@@ -152,31 +152,20 @@ function start(app, express) {
 			collectionName=fullPath[1].toLowerCase();
 			action=fullPath[2];
 
+			// set the ACS admin user, the one who can add records
+			// this could also come from the querystring, allowing for 
+			// more granular ownership of records...but that's not implemented
+			var adminUser={
+				login:settings.ADMIN_UID,
+				password:settings.ADMIN_PWD
+			}
+
 			// react accordingly
 			switch(action.toUpperCase()){
 				case "SET":
-					// set the ACS admin user, the one who can add records
-					// this could also come from the query, allowing for 
-					// more granular ownership of records
-					var adminUser={
-						login:settings.ADMIN_UID,
-						password:settings.ADMIN_PWD
-					}
-
-					// try to grab collection name and data object
-					// I'm using try catch just to make sure I can parse the object
-					try{
-						// should get data via POST
-						//var collectionName=req.body.collection;
-						var objectToAdd=req.body.data;
-						var objectToAdd=JSON.parse(objectToAdd);
-						//	
-					}catch(e){
-						res.send({message: 'Some error'});
-					}
+					var objectToAdd=req.body.data;
+					var objectToAdd=JSON.parse(objectToAdd);
 					
-					//
-					// login to ACS and add the new object to the as an ACS Custom Object
 					ACS.Users.login(adminUser,function(e){
 						var session_id=e.meta.session_id;
 						if (e.success){
@@ -193,17 +182,50 @@ function start(app, express) {
 							});
 						}
 					})
-					//
 					break;
-
 				case "EDIT":
-					// should get data via POST
-					break;
+					var recToUpdate=req.body.id;
+					var objectToUpdate=req.body.data;
+					var objectToUpdate=JSON.parse(objectToUpdate);
 
+					ACS.Users.login(adminUser,function(e){
+						var session_id=e.meta.session_id;
+						if (e.success){
+							ACS.Objects.update({
+							    classname: collectionName,
+							    id:recToUpdate,
+							    fields: objectToUpdate,
+							    session_id:session_id // pass the freaking sessionId god dammit
+							}, function (e) {
+							    if (e.success) {
+							        res.send({message:'Success'});
+							    } else {
+							        res.send({message:((e.error && e.message) || JSON.stringify(e))});
+							    }
+							});
+						}
+					})
+					break;
 				case "DELETE":
-					// should get data via POST
+					var recToDelete=req.body.id;
+					
+					ACS.Users.login(adminUser,function(e){
+						var session_id=e.meta.session_id;
+						if (e.success){
+							ACS.Objects.remove({
+							    classname: collectionName,
+							    id: recToDelete,
+							    session_id:session_id // pass the freaking sessionId god dammit
+							}, function (e) {
+							    if (e.success) {
+							        res.send({message:'Success'});
+							    } else {
+							        res.send({message:((e.error && e.message) || JSON.stringify(e))});
+							    }
+							});
+						}
+					})
 					break;
-
 				default:
 					res.send({message:'Wrong action'});
 			}

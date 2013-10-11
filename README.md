@@ -71,7 +71,7 @@ http://yourhost/api/employees/..
 ```
 
 ## API
-** LilACS ** exposes the following arguments from the ACS 'query' method:
+**LilACS** exposes the following arguments from the ACS 'query' method:
 
 * where (exposed as get. allows comma-separated list of value-pairs)
 * classname (exposed as the first paramenter after /api)
@@ -85,31 +85,30 @@ There's only one simple rule to creating a LilACS URL, and that is that they are
 
 ## Use-cases 
 
-** Get all records from employees where department='Finance' **
+**Get all records from employees where department='Finance'**
 
 ```
 http://yourhost/api/employees/get/department='Finance'
 ```
-** Get all employees ordered by name **
+**Get all employees ordered by name**
 
 ```
 http://yourhost/api/employees/get/all/order/name
 ```
 
-** Get all employees where name='Ricardo' and order by creation date descending **
+**Get all employees where name='Ricardo' and order by creation date descending**
 
 ```
 http://yourhost/api/employees/name='Ricardo'/order/-created_at
 ```
 
-** Get all employees where name='Ricardo' and department='Finance' order by creation date descending **
+**Get all employees where name='Ricardo' and department='Finance' order by creation date descending**
 
 ```
 http://yourhost/api/employees/name='Ricardo',department='Finance'/order/-created_at
 ```
 
-
-** Pagination : Previous example, but in pages of 10 records each **
+**Pagination : Previous example, but in pages of 10 records each**
 
 ```
 http://yourhost/api/employees/name='Ricardo'/order/-created_at/per_page/10/page/1
