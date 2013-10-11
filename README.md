@@ -54,10 +54,10 @@ Records are added as JSON Objects.  For example:
 }
 ```
 
-To add this record, simply POST the data via HTTP.  You must specify the data-set to add to.  To post this record, POST a variable named 'data' to the "Employees" data-set:
+To add this record, simply **POST** the data via HTTP.  You must specify the data-set to add to.  To post this record, POST a variable named 'data' to the "Employees" data-set:
 
 ```
-http://yourhost/api/employees/set
+http://yourhost/api/**employees**/set
 
 ```
 
@@ -70,7 +70,16 @@ Right after adding your first record, a full REST API will be exposed to you to 
 http://yourhost/api/employees/..
 ```
 
-## API
+### Updating records
+
+Updating is similar to Adding, but simply call **/edit** and **POST** the variable **'id'** along with **'data'**, id being the id of the record to update.
+
+### Deleting records
+
+To delete simply call **/delete** and **POST** the variable **'id'**, id being the id of the record to remove.
+
+
+## HTTP GET API
 **LilACS** exposes the following arguments from the ACS 'query' method:
 
 * where (exposed as get. allows comma-separated list of value-pairs)
