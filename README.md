@@ -57,7 +57,7 @@ Records are added as JSON Objects.  For example:
 To add this record, simply **POST** the data via HTTP.  You must specify the data-set to add to.  To post this record, POST a variable named 'data' to the "Employees" data-set:
 
 ```
-http://yourhost/api/**employees**/set
+http://yourhost/api/employees/set
 
 ```
 
