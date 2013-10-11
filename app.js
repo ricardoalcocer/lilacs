@@ -71,9 +71,19 @@ function start(app, express) {
 					// this helped: http://stackoverflow.com/questions/6335264/find-comma-in-quotes-with-regex-and-replace-with-html-equiv
 		
 					getValues={};
+					console.log(whereArray);
 					whereArray.forEach(function(item){			
-						//create an object but replace the comma and remove double quotes before adding 
+						/*
+						When operator is = , format as:
+							where={foo:bar}
+						all other should be formated as:
+							where={foo: {"$gt":28}}
+						 */
+						
 						getValues[item.split('=')[0].trim()]=item.split('=')[1].replace('&#44',',').replace(/\"/g,'').trim();
+					
+						//create an object but replace the comma and remove double quotes before adding 
+						//getValues[item.split('=')[0].trim()]=item.split('=')[1].replace('&#44',',').replace(/\"/g,'').trim();
 						// this helped: http://stackoverflow.com/questions/2390789/how-to-replace-all-periods-in-a-string-in-javascript
 					})
 					acsPayload.where=getValues;

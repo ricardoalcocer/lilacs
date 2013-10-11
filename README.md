@@ -42,7 +42,33 @@ Keys and admin user info.  Save this file as **/lib/lilacs.js**
 ## Usage
 LilACS is designed with simplicity in mind.  Once you have LilACS running, your backend is ready to start receiving requests at http://your_domain/api/xxxxx.  When testing, ACS will give you the local URL and port.  When published, ACS also gives you a URL, but you can assign a CNAME to an existing domain and point it to your NodeACS app.  
 
-When adding records, each will be part of a data collection, which is specified at the moment of posting it.  Right after adding your first record, a full REST API will be exposed to you to manage the data.
+### Adding records
+
+Records are added as JSON Objects.  For example:
+
+```
+{
+	name: 'Ricardo',
+	lname: 'Alcocer,
+	department: 'Finance'
+}
+```
+
+To add this record, simply POST the data via HTTP.  You must specify the data-set to add to.  To post this record, POST a variable named 'data' to the "Employees" data-set:
+
+```
+http://yourhost/api/employees/set
+
+```
+
+If this is a new data-set it will be created, otherwise, the data will be appended.
+
+
+Right after adding your first record, a full REST API will be exposed to you to manage the data, in this case located at:
+
+```
+http://yourhost/api/employees/..
+```
 
 ## API
 ** LilACS ** exposes the following arguments from the ACS 'query' method:
