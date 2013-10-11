@@ -14,6 +14,7 @@ function start(app, express) {
 
 	// any request going to /api/* will go through here.  Every other will be handled by express
 
+
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	// catch all route for HTTP GET 
 	app.get('/api/*', function(req, res, next){
@@ -61,35 +62,67 @@ function start(app, express) {
 				if (skipValue !== null){
 					acsPayload.skip=skipValue;
 				}
+				//
 
 				// if there are get parameters, then add them as a where clause
 				if (getValue.toLowerCase() !== 'all'){
-					// Now the hacky part:
 					
+					// Now the hacky part:
 					// I replace all commas within quotes for their HTML value and then split by commas
 					whereArray=unescape(getValue).replace(/"[^"]*"/g, function(g0){return g0.replace(/,/g,'&#44');}).split(',');
 					// this helped: http://stackoverflow.com/questions/6335264/find-comma-in-quotes-with-regex-and-replace-with-html-equiv
 		
 					getValues={};
-					console.log(whereArray);
-					whereArray.forEach(function(item){			
-						/*
-						When operator is = , format as:
-							where={foo:bar}
-						all other should be formated as:
-							where={foo: {"$gt":28}}
-						 */
-						
-						getValues[item.split('=')[0].trim()]=item.split('=')[1].replace('&#44',',').replace(/\"/g,'').trim();
 					
-						//create an object but replace the comma and remove double quotes before adding 
-						//getValues[item.split('=')[0].trim()]=item.split('=')[1].replace('&#44',',').replace(/\"/g,'').trim();
-						// this helped: http://stackoverflow.com/questions/2390789/how-to-replace-all-periods-in-a-string-in-javascript
+					// loop through every option
+					whereArray.forEach(function(item){			
+						var cond={};
+						var logicalOperators=['=','!=','>','>=','<','<='];
+
+						// Disclaimer: 
+						// this is problably not the best way of finding the 
+						// conditional operator...maybe matching with regex is a best approach
+						// let's just look at it as a proof of concept
+						logicalOperators.forEach(function(operator){
+							if (item.indexOf(operator) !== -1){
+								switch(operator){
+									case "=":
+										if (item.indexOf('!=') !== -1){
+											// if that equal sign is actually a not-equal
+											cond.$ne=item.split('!=')[1].replace('&#44',',').replace(/\"/g,'').trim()
+											getValues[item.split('!=')[0].trim()]=cond;
+										}else{
+											getValues[item.split(operator)[0].trim()]=item.split(operator)[1].replace('&#44',',').replace(/\"/g,'').trim();
+										}
+										break;
+									case ">":
+										cond.$gt=item.split(operator)[1].replace('&#44',',').replace(/\"/g,'').trim()
+										getValues[item.split(operator)[0].trim()]=cond;
+										break;
+									case ">=":
+										cond.$gte=item.split(operator)[1].replace('&#44',',').replace(/\"/g,'').trim()
+										getValues[item.split(operator)[0].trim()]=cond;
+										break;
+									case "<":
+										cond.$lt=item.split(operator)[1].replace('&#44',',').replace(/\"/g,'').trim()
+										getValues[item.split(operator)[0].trim()]=cond;
+										break;
+									case "<=":
+										cond.$lte=item.split(operator)[1].replace('&#44',',').replace(/\"/g,'').trim()
+										getValues[item.split(operator)[0].trim()]=cond;
+										break;
+									default:
+										if (operator !== '!='){
+											console.log('Invalid operator: ' + operator);
+										}
+								}
+							}
+						})
 					})
 					acsPayload.where=getValues;
 				}
 				
-				console.log(acsPayload);
+				console.log('ACS Payload: ' + JSON.stringify(acsPayload));
 
 				// let's do this!
 				ACS.Objects.query(acsPayload,
@@ -104,6 +137,8 @@ function start(app, express) {
 			res.send({message:'Need to provide Class Name and Action'});
 		}
 	});
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	// catch all route for HTTP POST
@@ -176,6 +211,7 @@ function start(app, express) {
 			res.send({message:'Need to provide Class Name and Action'});
 		}
 	});
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }
 
 // release resources
