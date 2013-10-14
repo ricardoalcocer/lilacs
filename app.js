@@ -29,16 +29,18 @@ function start(app, express) {
 				collectionName=fullPath[1].toLowerCase();
 
 				// get values from querystring
-				var getValue=_.find(parsedActions,{'action': 'get'}).value;
-				var orderValue=_.find(parsedActions,{'action': 'order'}).value;
-				var pageValue=_.find(parsedActions,{'action': 'page'}).value;
-				var per_pageValue=_.find(parsedActions,{'action': 'per_page'}).value;
-				var limitValue=_.find(parsedActions,{'action': 'limit'}).value;
-				var skipValue=_.find(parsedActions,{'action': 'skip'}).value;
-
+				var getValue 		=	_.find(parsedActions,{'action': 'get'}).value;
+				var orderValue		=	_.find(parsedActions,{'action': 'order'}).value;
+				var pageValue 		=	_.find(parsedActions,{'action': 'page'}).value;
+				var per_pageValue 	=	_.find(parsedActions,{'action': 'per_page'}).value;
+				var limitValue 		=	_.find(parsedActions,{'action': 'limit'}).value;
+				var skipValue 		=	_.find(parsedActions,{'action': 'skip'}).value;
+				var columnsValue 	=	_.find(parsedActions,{'action': 'columns'}).value;
+				
 				// create acs payload object
 				var acsPayload={};
 				acsPayload.classname=collectionName;
+				//acsPayload.unsel=JSON.stringify({"all":["user"]}); // remove the user object from the output
 
 				/*				
 				'name="foo, inc",crap,bar="baz"'.split(/(\w+\=\"[^"]*\")?\s*,/).filter(function(x){return x;})
@@ -62,6 +64,12 @@ function start(app, express) {
 				if (skipValue !== null){
 					acsPayload.skip=skipValue;
 				}
+				if (columnsValue !== null){
+					acsPayload.sel=JSON.stringify({"all":columnsValue.split(',')});	
+				}
+
+				//testing columns:
+				//acsPayload.sel=JSON.stringify({"all":["name","id"]}); // this works
 				//
 
 				// if there are get parameters, then add them as a where clause
@@ -207,16 +215,17 @@ function start(app, express) {
 					})
 					break;
 				case "DELETE":
-					var recToDelete=req.body.id;
-					
+					var objDelete={};
+					objDelete.classname=collectionName;
+					if (req.body.ids || req.body.id){
+						if (req.body.id) {objDelete.id=req.body.id} else {objDelete.ids=req.body.ids};
+					}
+
 					ACS.Users.login(adminUser,function(e){
 						var session_id=e.meta.session_id;
 						if (e.success){
-							ACS.Objects.remove({
-							    classname: collectionName,
-							    id: recToDelete,
-							    session_id:session_id // pass the freaking sessionId god dammit
-							}, function (e) {
+							objDelete.session_id=session_id // pass the freaking sessionId god dammit
+							ACS.Objects.remove(objDelete, function (e) {
 							    if (e.success) {
 							        res.send({message:'Success'});
 							    } else {
@@ -225,6 +234,7 @@ function start(app, express) {
 							});
 						}
 					})
+					console.log(objDelete);
 					break;
 				default:
 					res.send({message:'Wrong action'});

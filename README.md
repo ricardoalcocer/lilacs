@@ -76,7 +76,7 @@ Updating is similar to Adding, but simply call **/edit** and **POST** the variab
 
 ### Deleting records
 
-To delete simply call **/delete** and **POST** the variable **'id'**, id being the id of the record to remove.
+To delete simply call **/delete** and **POST** the variable **'id'**, id being the id of the record to remove.  In case you wish to delete more than one record, sent the variable **'ids'** instead and all record ids separated by commas.
 
 
 ## HTTP GET API
@@ -89,8 +89,9 @@ To delete simply call **/delete** and **POST** the variable **'id'**, id being t
 * per_page
 * limit
 * skip
+* columns (allows comma-separated list of columns to get in your result set)
 
-There's only one simple rule to creating a LilACS URL, and that is that they are value pairs.  
+There's only one simple rule to creating a LilACS URL, and that is that they are value pairs, so specifying get requires a value after it, for example: /employees/get/all.  In this case, all is the parameter to 'get'.  Look at the use-cases to learn more.
 
 ## Use-cases 
 
@@ -105,6 +106,12 @@ http://yourhost/api/employees/get/department='Finance'
 http://yourhost/api/employees/get/all/order/name
 ```
 
+**Get all employees ordered by name but only the id and name columns**
+
+```
+http://yourhost/api/employees/get/all/order/name/columns/id,name
+```
+
 **Get all employees where name='Ricardo' and order by creation date descending**
 
 ```
@@ -116,6 +123,7 @@ http://yourhost/api/employees/name='Ricardo'/order/-created_at
 ```
 http://yourhost/api/employees/name='Ricardo',department='Finance'/order/-created_at
 ```
+Note: Allowed logical operators are: =, >, <, >=, <= and !=
 
 **Pagination : Previous example, but in pages of 10 records each**
 
