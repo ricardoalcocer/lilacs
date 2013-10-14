@@ -88,6 +88,7 @@ function start(app, express) {
 					
 					// loop through every option
 					whereArray.forEach(function(item){			
+						console.log(item);
 						var cond={};
 						var logicalOperators=['=','!=','>','>=','<','<='];
 
@@ -135,7 +136,7 @@ function start(app, express) {
 				}
 				//
 				
-				//console.log('ACS Payload: ' + JSON.stringify(acsPayload));
+				console.log('ACS Payload: ' + JSON.stringify(acsPayload));
 
 				// let's do this!
 				ACS.Objects.query(acsPayload,
