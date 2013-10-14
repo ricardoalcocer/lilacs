@@ -1,3 +1,14 @@
+/*!
+* Lilacs - Li'l ACS by Ricardo Alcocer
+* @ricardoalcocer | http://ricardoalcocer.com/
+*
+* NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK.
+*/
+
+/**
+* REST-ish wrapper around Appcelerator Cloud Services.  Provides an instant API on top of the Custom Objects data store
+*/
+
 var _ = require('lodash');
 var settings=require('/lib/lilacs.js').getSettings();
 var parseActions=require('/lib/lilacsmod.js').parseActions;
@@ -13,7 +24,6 @@ function start(app, express) {
 	ACS.init(ACS_KEY,ACS_SECRET);
 
 	// any request going to /api/* will go through here.  Every other will be handled by express
-
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	// catch all route for HTTP GET 
@@ -40,7 +50,6 @@ function start(app, express) {
 				// create acs payload object
 				var acsPayload={};
 				acsPayload.classname=collectionName;
-				//acsPayload.unsel=JSON.stringify({"all":["user"]}); // remove the user object from the output
 
 				/*				
 				'name="foo, inc",crap,bar="baz"'.split(/(\w+\=\"[^"]*\")?\s*,/).filter(function(x){return x;})
@@ -67,10 +76,6 @@ function start(app, express) {
 				if (columnsValue !== null){
 					acsPayload.sel=JSON.stringify({"all":columnsValue.split(',')});	
 				}
-
-				//testing columns:
-				//acsPayload.sel=JSON.stringify({"all":["name","id"]}); // this works
-				//
 
 				// if there are get parameters, then add them as a where clause
 				if (getValue.toLowerCase() !== 'all'){
@@ -130,7 +135,7 @@ function start(app, express) {
 					acsPayload.where=getValues;
 				}
 				
-				console.log('ACS Payload: ' + JSON.stringify(acsPayload));
+				//console.log('ACS Payload: ' + JSON.stringify(acsPayload));
 
 				// let's do this!
 				ACS.Objects.query(acsPayload,
@@ -155,7 +160,6 @@ function start(app, express) {
 		var fullPath=req.path.replace(/^\/|\/$/g,'').split('/');
 
 		if (fullPath.length >=3){
-			console.log(fullPath);
 			// get arguments from query string
 			collectionName=fullPath[1].toLowerCase();
 			action=fullPath[2];
@@ -234,7 +238,6 @@ function start(app, express) {
 							});
 						}
 					})
-					console.log(objDelete);
 					break;
 				default:
 					res.send({message:'Wrong action'});
