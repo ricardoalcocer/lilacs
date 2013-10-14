@@ -55,7 +55,6 @@ function start(app, express) {
 				'name="foo, inc",crap,bar="baz"'.split(/(\w+\=\"[^"]*\")?\s*,/).filter(function(x){return x;})
 				this regex hack was brought to you by @cb1kenobi 
 				*/
-				
 
 				// assemble ACS Payload Object
 				if (orderValue !== null){
@@ -134,6 +133,7 @@ function start(app, express) {
 					})
 					acsPayload.where=getValues;
 				}
+				//
 				
 				//console.log('ACS Payload: ' + JSON.stringify(acsPayload));
 
@@ -143,11 +143,13 @@ function start(app, express) {
 						var outData=e[collectionName];
 						res.send(JSON.stringify(outData));
 					}
-				)			
+				)
+				//			
+			}else{
+				res.send({message:'Malformed URL.  Remember, value pairs'});	
 			}
-			
 		}else{
-			res.send({message:'Need to provide Class Name and Action'});
+			res.send({message:'Need to provide Data-Store name and Action'});
 		}
 	});
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -221,23 +223,26 @@ function start(app, express) {
 				case "DELETE":
 					var objDelete={};
 					objDelete.classname=collectionName;
+
 					if (req.body.ids || req.body.id){
 						if (req.body.id) {objDelete.id=req.body.id} else {objDelete.ids=req.body.ids};
+					
+						ACS.Users.login(adminUser,function(e){
+							var session_id=e.meta.session_id;
+							if (e.success){
+								objDelete.session_id=session_id // pass the freaking sessionId god dammit
+								ACS.Objects.remove(objDelete, function (e) {
+								    if (e.success) {
+								        res.send({message:'Success'});
+								    } else {
+								        res.send({message:((e.error && e.message) || JSON.stringify(e))});
+								    }
+								});
+							}
+						})
+					}else{
+						res.send('You want to delete, but you don\'t tell me what?')
 					}
-
-					ACS.Users.login(adminUser,function(e){
-						var session_id=e.meta.session_id;
-						if (e.success){
-							objDelete.session_id=session_id // pass the freaking sessionId god dammit
-							ACS.Objects.remove(objDelete, function (e) {
-							    if (e.success) {
-							        res.send({message:'Success'});
-							    } else {
-							        res.send({message:((e.error && e.message) || JSON.stringify(e))});
-							    }
-							});
-						}
-					})
 					break;
 				default:
 					res.send({message:'Wrong action'});
