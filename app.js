@@ -31,126 +31,154 @@ function start(app, express) {
 		res.setHeader('Content-Type', 'application/json');
 		var fullPath=req.path.replace(/^\/|\/$/g,'').split('/');
 		
-		if (fullPath.length >=3){
-			var parsedActions=parseActions(fullPath);
-			
-			if (parsedActions !== null){
-				// get collection name from query string
-				collectionName=fullPath[1].toLowerCase();
-
-				// get values from querystring
-				var getValue 		=	_.find(parsedActions,{'action': 'get'}).value;
-				var orderValue		=	_.find(parsedActions,{'action': 'order'}).value;
-				var pageValue 		=	_.find(parsedActions,{'action': 'page'}).value;
-				var per_pageValue 	=	_.find(parsedActions,{'action': 'per_page'}).value;
-				var limitValue 		=	_.find(parsedActions,{'action': 'limit'}).value;
-				var skipValue 		=	_.find(parsedActions,{'action': 'skip'}).value;
-				var columnsValue 	=	_.find(parsedActions,{'action': 'columns'}).value;
-				
-				// create acs payload object
-				var acsPayload={};
-				acsPayload.classname=collectionName;
-
-				/*				
-				'name="foo, inc",crap,bar="baz"'.split(/(\w+\=\"[^"]*\")?\s*,/).filter(function(x){return x;})
-				this regex hack was brought to you by @cb1kenobi 
-				*/
-
-				// assemble ACS Payload Object
-				if (orderValue !== null){
-					acsPayload.order=orderValue;
-				}
-				if (pageValue !== null){
-					acsPayload.page=pageValue;
-				}
-				if (per_pageValue !== null){
-					acsPayload.per_page=per_pageValue;
-				}
-				if (limitValue !== null){
-					acsPayload.limit=limitValue;
-				}
-				if (skipValue !== null){
-					acsPayload.skip=skipValue;
-				}
-				if (columnsValue !== null){
-					acsPayload.sel=JSON.stringify({"all":columnsValue.split(',')});	
-				}
-
-				// if there are get parameters, then add them as a where clause
-				if (getValue.toLowerCase() !== 'all'){
-					
-					// Now the hacky part:
-					// I replace all commas within quotes for their HTML value and then split by commas
-					whereArray=unescape(getValue).replace(/"[^"]*"/g, function(g0){return g0.replace(/,/g,'&#44');}).split(',');
-					// this helped: http://stackoverflow.com/questions/6335264/find-comma-in-quotes-with-regex-and-replace-with-html-equiv
-		
-					getValues={};
-					
-					// loop through every option
-					whereArray.forEach(function(item){			
-						console.log(item);
-						var cond={};
-						var logicalOperators=['=','!=','>','>=','<','<='];
-
-						// Disclaimer: 
-						// this is problably not the best way of finding the 
-						// conditional operator...maybe matching with regex is a best approach
-						// let's just look at it as a proof of concept
-						logicalOperators.forEach(function(operator){
-							if (item.indexOf(operator) !== -1){
-								switch(operator){
-									case "=":
-										if (item.indexOf('!=') !== -1){
-											// if that equal sign is actually a not-equal
-											cond.$ne=item.split('!=')[1].replace('&#44',',').replace(/\"/g,'').trim()
-											getValues[item.split('!=')[0].trim()]=cond;
-										}else{
-											getValues[item.split(operator)[0].trim()]=item.split(operator)[1].replace('&#44',',').replace(/\"/g,'').trim();
-										}
-										break;
-									case ">":
-										cond.$gt=item.split(operator)[1].replace('&#44',',').replace(/\"/g,'').trim()
-										getValues[item.split(operator)[0].trim()]=cond;
-										break;
-									case ">=":
-										cond.$gte=item.split(operator)[1].replace('&#44',',').replace(/\"/g,'').trim()
-										getValues[item.split(operator)[0].trim()]=cond;
-										break;
-									case "<":
-										cond.$lt=item.split(operator)[1].replace('&#44',',').replace(/\"/g,'').trim()
-										getValues[item.split(operator)[0].trim()]=cond;
-										break;
-									case "<=":
-										cond.$lte=item.split(operator)[1].replace('&#44',',').replace(/\"/g,'').trim()
-										getValues[item.split(operator)[0].trim()]=cond;
-										break;
-									default:
-										if (operator !== '!='){
-											console.log('Invalid operator: ' + operator);
-										}
-								}
-							}
-						})
+		switch (fullPath[1].toLowerCase()){
+			// Login is required even for GET requests
+			case 'login':
+				if (fullPath[2]){
+					ACS.Users.login({
+						login: fullPath[2].split(',')[0],
+						password:fullPath[2].split(',')[1]
+					},function(e){
+						if (e.success){
+							req.session.session_id=e.meta.session_id;
+							res.send({message:'Login sucessfull'});
+						}else{
+							res.send({message:'Invalid user name and password'});
+						}
 					})
-					acsPayload.where=getValues;
+				}else{
+					res.send({message:'No user name and password provided'});
 				}
-				//
-				
-				console.log('ACS Payload: ' + JSON.stringify(acsPayload));
-
-				// let's do this!
-				ACS.Objects.query(acsPayload,
-					function(e){
-						var outData=e[collectionName];
-						res.send(JSON.stringify(outData));
+				break;
+			case 'logout':
+				ACS.Users.logout(function(e){
+					if (e.success){
+						res.send({message:'Logout sucessfull'});		
 					}
-				)
-				//			
-			}else{
-				res.send({message:'Malformed URL.  Remember, value pairs'});	
-			}
-		}else{
-			res.send({message:'Need to provide Data-Store name and Action'});
+				})
+				break;
+			default:
+				if (req.session.session_id){
+					if (fullPath.length >=3){
+						var parsedActions=parseActions(fullPath);
+						
+						if (parsedActions !== null){
+							// get collection name from query string
+							collectionName=fullPath[1].toLowerCase();
+
+							// get values from querystring
+							var getValue 		=	_.find(parsedActions,{'action': 'get'}).value;
+							var orderValue		=	_.find(parsedActions,{'action': 'order'}).value;
+							var pageValue 		=	_.find(parsedActions,{'action': 'page'}).value;
+							var per_pageValue 	=	_.find(parsedActions,{'action': 'per_page'}).value;
+							var limitValue 		=	_.find(parsedActions,{'action': 'limit'}).value;
+							var skipValue 		=	_.find(parsedActions,{'action': 'skip'}).value;
+							var columnsValue 	=	_.find(parsedActions,{'action': 'columns'}).value;
+							
+							// create acs payload object
+							var acsPayload={};
+							acsPayload.classname=collectionName;
+
+							// assemble ACS Payload Object
+							if (orderValue !== null){
+								acsPayload.order=orderValue;
+							}
+							if (pageValue !== null){
+								acsPayload.page=pageValue;
+							}
+							if (per_pageValue !== null){
+								acsPayload.per_page=per_pageValue;
+							}
+							if (limitValue !== null){
+								acsPayload.limit=limitValue;
+							}
+							if (skipValue !== null){
+								acsPayload.skip=skipValue;
+							}
+							if (columnsValue !== null){
+								acsPayload.sel=JSON.stringify({"all":columnsValue.split(',')});	
+							}
+
+							// if there are get parameters, then add them as a where clause
+							if (getValue.toLowerCase() !== 'all'){
+								
+								// Now the hacky part:
+								// I replace all commas within quotes for their HTML value and then split by commas
+								whereArray=unescape(getValue).replace(/"[^"]*"/g, function(g0){return g0.replace(/,/g,'&#44');}).split(',');
+								// this helped: http://stackoverflow.com/questions/6335264/find-comma-in-quotes-with-regex-and-replace-with-html-equiv
+					
+								getValues={};
+								
+								// loop through every option
+								whereArray.forEach(function(item){			
+									console.log(item);
+									var cond={};
+									var logicalOperators=['=','!=','>','>=','<','<='];
+
+									// Disclaimer: 
+									// this is problably not the best way of finding the 
+									// conditional operator...maybe matching with regex is a best approach
+									// let's just look at it as a proof of concept
+									logicalOperators.forEach(function(operator){
+										if (item.indexOf(operator) !== -1){
+											switch(operator){
+												case "=":
+													if (item.indexOf('!=') !== -1){
+														// if that equal sign is actually a not-equal
+														cond.$ne=item.split('!=')[1].replace('&#44',',').replace(/\"/g,'').trim()
+														getValues[item.split('!=')[0].trim()]=cond;
+													}else{
+														getValues[item.split(operator)[0].trim()]=item.split(operator)[1].replace('&#44',',').replace(/\"/g,'').trim();
+													}
+													break;
+												case ">":
+													cond.$gt=item.split(operator)[1].replace('&#44',',').replace(/\"/g,'').trim()
+													getValues[item.split(operator)[0].trim()]=cond;
+													break;
+												case ">=":
+													cond.$gte=item.split(operator)[1].replace('&#44',',').replace(/\"/g,'').trim()
+													getValues[item.split(operator)[0].trim()]=cond;
+													break;
+												case "<":
+													cond.$lt=item.split(operator)[1].replace('&#44',',').replace(/\"/g,'').trim()
+													getValues[item.split(operator)[0].trim()]=cond;
+													break;
+												case "<=":
+													cond.$lte=item.split(operator)[1].replace('&#44',',').replace(/\"/g,'').trim()
+													getValues[item.split(operator)[0].trim()]=cond;
+													break;
+												default:
+													if (operator !== '!='){
+														console.log('Invalid operator: ' + operator);
+													}
+											}
+										}
+									})
+								})
+								acsPayload.where=getValues;
+							}
+							//
+							
+							console.log('ACS Payload: ' + JSON.stringify(acsPayload));
+
+							// let's do this!
+							ACS.Objects.query(acsPayload,
+								function(e){
+									var outData=e[collectionName];
+									res.send(JSON.stringify(outData));
+								}
+							)
+							//			
+						}else{
+							res.send({message:'Malformed URL.  Remember, value pairs'});	
+						}
+					}else{
+						res.send({message:'Need to provide Data-Store name and Action'});
+					}
+				}else{
+					res.send({message:'Unauthorized access.  Please login first'});
+				}
+				break;
 		}
 	});
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
