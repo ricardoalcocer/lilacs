@@ -142,5 +142,9 @@ Note: Allowed logical operators are: =, >, <, >=, <= and !=
 http://yourhost/api/employees/name='Ricardo'/order/-created_at/per_page/10/page/1
 ```
 
+### License
+
+Licensed under the terms of the MIT License | [http://alco.mit-license.org/](http://alco.mit-license.org/)
+
 ### That's that for now
 
