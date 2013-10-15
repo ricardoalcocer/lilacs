@@ -42,6 +42,17 @@ Keys and admin user info.  Save this file as **/lib/lilacs.js**
 ## Usage
 LilACS is designed with simplicity in mind.  Once you have LilACS running, your backend is ready to start receiving requests at http://your_domain/api/xxxxx.  When testing, ACS will give you the local URL and port.  When published, ACS also gives you a URL, but you can assign a CNAME to an existing domain and point it to your NodeACS app.  
 
+### Loggin in
+GET requests are protected, so you'll need to first login to the API so you can start fectching data.  The consumer user needs to be created in ACS firts.  Assuming the user is u=jack and p=bauer, you'd login in like this:
+
+```
+http://yourhost/api/login/jack,bauer]
+```
+
+You'll receive a "Login successful"" response (or not).  A cookie-based session will be created for you and you're ready to start making GET calls. 
+
+**Note:  This feature has been very weakly tested.**
+
 ### Adding records
 
 Records are added as JSON Objects.  For example:

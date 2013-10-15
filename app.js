@@ -53,6 +53,7 @@ function start(app, express) {
 			case 'logout':
 				ACS.Users.logout(function(e){
 					if (e.success){
+						req.session.session_id=null;
 						res.send({message:'Logout sucessfull'});		
 					}
 				})
