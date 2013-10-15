@@ -10,8 +10,8 @@
 */
 
 var _ = require('lodash');
-var settings=require('/lib/lilacs.js').getSettings();
-var parseActions=require('/lib/lilacsmod.js').parseActions;
+var settings=require('./lib/lilacs.js').getSettings();
+var parseActions=require('./lib/lilacsmod.js').parseActions;
 
 var ACS = require('acs').ACS;
 var ACS_KEY=settings.ACS_KEY;
