@@ -1,7 +1,8 @@
 {
   "routes":
   [
-    { "path": "/", "callback": "application#index" }
+    { "path": "/", "callback": "application#index" },
+    { "path": "/admin", "callback": "admin#home" }
   ],
   "filters":
   [

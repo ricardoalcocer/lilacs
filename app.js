@@ -12,6 +12,7 @@
 var _ = require('lodash');
 var settings=require('./lib/lilacs.js').getSettings();
 var parseActions=require('./lib/lilacsmod.js').parseActions;
+var _events=require('./lib/lilacsevents.js');
 
 var ACS = require('acs').ACS;
 var ACS_KEY=settings.ACS_KEY;
@@ -209,23 +210,31 @@ function start(app, express) {
 				case "SET":
 					var objectToAdd=req.body.data;
 					var objectToAdd=JSON.parse(objectToAdd);
+
+					// execute user-defined event
+					var isValid=_events.call('onset',collectionName,req.body.data);
+					//
 					
-					ACS.Users.login(adminUser,function(e){
-						var session_id=e.meta.session_id;
-						if (e.success){
-							ACS.Objects.create({
-							    classname: collectionName,
-							    fields: objectToAdd,
-							    session_id:session_id // pass the freaking sessionId god dammit
-							}, function (e) {
-							    if (e.success) {
-							        res.send({message:'Success'});
-							    } else {
-							        res.send({message:((e.error && e.message) || JSON.stringify(e))});
-							    }
-							});
-						}
-					})
+					if (isValid === true){
+						ACS.Users.login(adminUser,function(e){
+							var session_id=e.meta.session_id;
+							if (e.success){
+								ACS.Objects.create({
+								    classname: collectionName,
+								    fields: objectToAdd,
+								    session_id:session_id // pass the freaking sessionId god dammit
+								}, function (e) {
+								    if (e.success) {
+								        res.send({message:'Success'});
+								    } else {
+								        res.send({message:((e.error && e.message) || JSON.stringify(e))});
+								    }
+								});
+							}
+						})
+					}else{
+						res.send({message:isValid})
+					}
 					break;
 				case "EDIT":
 					var recToUpdate=req.body.id;
