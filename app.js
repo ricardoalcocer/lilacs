@@ -210,22 +210,29 @@ function start(app, express) {
 					var objectToAdd=req.body.data;
 					var objectToAdd=JSON.parse(objectToAdd);
 					
-					ACS.Users.login(adminUser,function(e){
-						var session_id=e.meta.session_id;
-						if (e.success){
-							ACS.Objects.create({
-							    classname: collectionName,
-							    fields: objectToAdd,
-							    session_id:session_id // pass the freaking sessionId god dammit
-							}, function (e) {
-							    if (e.success) {
-							        res.send({message:'Success'});
-							    } else {
-							        res.send({message:((e.error && e.message) || JSON.stringify(e))});
-							    }
-							});
-						}
-					})
+					var isValid=lilacsEvents.onSet(req.body.data);
+
+					if (typeof isValid == 'boolean' && isValid){
+						ACS.Users.login(adminUser,function(e){
+							var session_id=e.meta.session_id;
+							if (e.success){
+								ACS.Objects.create({
+								    classname: collectionName,
+								    fields: objectToAdd,
+								    session_id:session_id // pass the freaking sessionId god dammit
+								}, function (e) {
+								    if (e.success) {
+								        res.send({message:'Success'});
+								    } else {
+								        res.send({message:((e.error && e.message) || JSON.stringify(e))});
+								    }
+								});
+							}
+						})						
+					}else{
+						res.send({message:isValid});
+					}
+
 					break;
 				case "EDIT":
 					var recToUpdate=req.body.id;
