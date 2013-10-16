@@ -12,6 +12,7 @@
 var _ = require('lodash');
 var settings=require('./lib/lilacs.js').getSettings();
 var parseActions=require('./lib/lilacsmod.js').parseActions;
+var _events=require('./lib/lilacsevents.js');
 
 var ACS = require('acs').ACS;
 var ACS_KEY=settings.ACS_KEY;
@@ -209,10 +210,12 @@ function start(app, express) {
 				case "SET":
 					var objectToAdd=req.body.data;
 					var objectToAdd=JSON.parse(objectToAdd);
-					
-					var isValid=lilacsEvents.onSet(req.body.data);
 
-					if (typeof isValid == 'boolean' && isValid){
+					// execute user-defined event
+					var isValid=_events.call('onset',collectionName,req.body.data);
+					//
+					
+					if (isValid === true){
 						ACS.Users.login(adminUser,function(e){
 							var session_id=e.meta.session_id;
 							if (e.success){
@@ -228,11 +231,10 @@ function start(app, express) {
 								    }
 								});
 							}
-						})						
+						})
 					}else{
-						res.send({message:isValid});
+						res.send({message:isValid})
 					}
-
 					break;
 				case "EDIT":
 					var recToUpdate=req.body.id;
