@@ -7,56 +7,84 @@
 
 LilACS (Li'l ACS) is a combiantion of Node.ACS (to expose an API) + ACS (as a data store), that will provide you with an instant API for you mobile or web app.
 
-## Installation
+---
+# Installation
+---
 
 The steps to get LilACS are:
 
-* Install ACS if you don't already have it: 
+## 1. Install ACS if you don't already have it: 
 
 ```
-[sudo] npm install acs -g
-```
-* Login to ACS: 
-
-```
-acs login
-```
-* Create an ACS project: 
-
-```
-acs new project_name
+$ [sudo] npm install acs -g
 ```
 
-* Clone this repo and drop it inside your new ACS project folder, replacing the default files
+## 2. Login to ACS: 
 
-* Go to **my.appcelerator.com** and open your ACS project
+```
+$ acs login
+```
 
-* Create a new **admin user**
+## 3. Create ACS App
 
-* On your ACS project folder, open **/lib/lilacs_template.js** and add your ACS 
-Keys and admin user info.  Save this file as **/lib/lilacs.js**
-
-* From a terminal, go to your project folder and run it: **acs run**
+Go to https://my.appcelerator.com/apps and create an ACS-only app.  Open this app, create an admin user and grab the ACS Key and ACS Secret
 
 
-## Usage
-LilACS is designed with simplicity in mind.  Once you have LilACS running, your backend is ready to start receiving requests at http://your_domain/api/xxxxx.  When testing, ACS will give you the local URL and port.  When published, ACS also gives you a URL, but you can assign a CNAME to an existing domain and point it to your NodeACS app.  
+## 4. Clone LilACS 
 
-### Loggin in
+```
+$ git clone https://github.com/ricardoalcocer/lilacs.git
+```
+
+## 5. Add settings
+
+Open **/lib/lilacs_template.js** and add your ACS Keys and admin user info.  Save this file as **/lib/lilacs.js**
+
+## 6. Launch and turn
+* From a terminal, go to your project folder and run it: 
+
+```
+$ acs run
+```
+* Point your browser to http://localhost:8080.  LilACS should be running
+
+
+---
+# Usage
+---
+
+Once you have LilACS running, your backend is ready to start receiving requests at http://your_domain:port/api/xxxxx.  
+
+## Loggin in
 GET requests are protected, so you'll need to first login to the API so you can start fectching data.  The consumer user needs to be created in ACS firts.  Assuming the user is u=jack and p=bauer, you'd login in like this:
 
 ```
-http://yourhost/api/login/jack,bauer]
+http://yourhost/api/login/jack,bauer
 ```
 
 You'll receive a "Login successful"" response (or not).  A cookie-based session will be created for you and you're ready to start making GET calls. 
 
 **Note:  This feature has been very weakly tested.**
 
+### The basics
+Records are added to **datasets**.  Your base url will allways be:
+
+```
+http://yourhost/api
+```
+
+The next querystring parameter is the **dataset**, so if your **dataset** is employees, your URL will be:
+
+```
+http://yourhost/api/employees
+```
+
 ### Adding records
 
-Records are added as JSON Objects.  For example:
+Records are added via HTTP Post.  Simply post a JavaScript Object in the **data** variable to http://yourhost/api/set.  For example:
 
+
+Example object:
 ```
 {
 	name: 'Ricardo',
@@ -65,32 +93,39 @@ Records are added as JSON Objects.  For example:
 }
 ```
 
-To add this record, simply **POST** the data via HTTP.  You must specify the data-set to add to.  To post this record, POST a variable named 'data' to the "Employees" data-set:
+To add this record to the employee **dataset**, simply **POST** the data via HTTP.  Data needs to be sent in a variable named **data**.
 
 ```
 http://yourhost/api/employees/set
 
 ```
 
-If this is a new data-set it will be created, otherwise, the data will be appended.
-
-
-Right after adding your first record, a full REST API will be exposed to you to manage the data, in this case located at:
-
-```
-http://yourhost/api/employees/..
-```
-
 ### Updating records
 
-Updating is similar to Adding, but simply call **/edit** and **POST** the variable **'id'** along with **'data'**, id being the id of the record to update.
+Updating is similar to Adding, but simply call **/edit** and **POST** the variable **id** along with **data**, id being the id of the record to update.  Your record will be replaced with the newly posted one.
+
+```
+http://yourhost/api/employees/edit
+
+```
 
 ### Deleting records
 
-To delete simply call **/delete** and **POST** the variable **'id'**, id being the id of the record to remove.  In case you wish to delete more than one record, sent the variable **'ids'** instead and all record ids separated by commas.
+To delete simply call **/delete** and **POST** the variable **id**, id being the id of the record to remove.  In case you wish to delete more than one record, sent the variable **ids** instead and all record ids separated by commas.
 
+```
+http://yourhost/api/employees/delete
 
-## HTTP GET API
+```
+
+## Querying records
+
+Right after adding your first record, a full REST API will be exposed to you to manage the data, in our example located at:
+
+```
+http://yourhost/api/employees/get
+```
+
 **LilACS** exposes the following arguments from the ACS 'query' method:
 
 * where (exposed as get. allows comma-separated list of value-pairs)
@@ -101,8 +136,6 @@ To delete simply call **/delete** and **POST** the variable **'id'**, id being t
 * limit
 * skip
 * columns (allows comma-separated list of columns to get in your result set)
-
-There's only one simple rule to creating a LilACS URL, and that is that they are value pairs, so specifying get requires a value after it, for example: /employees/get/all.  In this case, all is the parameter to 'get'.  Look at the use-cases to learn more.
 
 ## Use-cases 
 
@@ -126,13 +159,13 @@ http://yourhost/api/employees/get/all/order/name/columns/id,name
 **Get all employees where name='Ricardo' and order by creation date descending**
 
 ```
-http://yourhost/api/employees/name='Ricardo'/order/-created_at
+http://yourhost/api/employees/name="Ricardo"/order/-created_at
 ```
 
-**Get all employees where name='Ricardo' and department='Finance' order by creation date descending**
+**Get all employees where name="Ricardo" and department="Finance" order by creation date descending**
 
 ```
-http://yourhost/api/employees/name='Ricardo',department='Finance'/order/-created_at
+http://yourhost/api/employees/name="Ricardo",department="Finance"/order/-created_at
 ```
 Note: Allowed logical operators are: =, >, <, >=, <= and !=
 
@@ -142,9 +175,30 @@ Note: Allowed logical operators are: =, >, <, >=, <= and !=
 http://yourhost/api/employees/name='Ricardo'/order/-created_at/per_page/10/page/1
 ```
 
-### License
+**NOTE**
+Querystring parameters are value pairs, for example when querying a page, the URL looks like **/page/1**, where page is the variable and 1 is the value.  In case a parameter can receive multiple values, they are separated by commas.
+
+---
+# Stuff to-do and in-the-works
+---
+
+## Events
+Mechanism for adding onSet, onEdit, onValidate, onDelete events.  Initial tests are located in the file **/lib/lilacsevents**.js
+
+## Databrowser
+Provide an admin insterface for adminsitering records and events.  Initial tests are located at http://yourhost/admin.
+
+---
+# Contribuitors
+---
+
+* Ricardo Alcocer
+
+Pull requests are encouraged
+
+
+---
+# License
+---
 
 Licensed under the terms of the MIT License | [http://alco.mit-license.org/](http://alco.mit-license.org/)
-
-### That's that for now
-

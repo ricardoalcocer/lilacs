@@ -6,7 +6,8 @@
 */
 
 /**
-* REST-ish wrapper around Appcelerator Cloud Services.  Provides an instant API on top of the Custom Objects data store
+* REST-ish wrapper around Appcelerator Cloud Services.  Provides an instant API on 
+* top of the CustomObjects data store
 */
 
 var _ = require('lodash');
@@ -17,6 +18,8 @@ var _events=require('./lib/lilacsevents.js');
 var ACS = require('acs').ACS;
 var ACS_KEY=settings.ACS_KEY;
 var ACS_SECRET=settings.ACS_SECRET;
+
+var dataSetPrefix='lilacsds_';
 
 // initialize app
 function start(app, express) {
@@ -34,7 +37,7 @@ function start(app, express) {
 		
 		switch (fullPath[1].toLowerCase()){
 			// Login is required even for GET requests
-			case 'login':
+			/*case 'login':
 				if (fullPath[2]){
 					ACS.Users.login({
 						login: fullPath[2].split(',')[0],
@@ -58,129 +61,129 @@ function start(app, express) {
 						res.send({message:'Logout sucessfull'});		
 					}
 				})
-				break;
+				break;*/
 			default:
-				if (req.session.session_id){
-					if (fullPath.length >=3){
-						var parsedActions=parseActions(fullPath);
-						
-						if (parsedActions !== null){
-							// get collection name from query string
-							collectionName=fullPath[1].toLowerCase();
-
-							// get values from querystring
-							var getValue 		=	_.find(parsedActions,{'action': 'get'}).value;
-							var orderValue		=	_.find(parsedActions,{'action': 'order'}).value;
-							var pageValue 		=	_.find(parsedActions,{'action': 'page'}).value;
-							var per_pageValue 	=	_.find(parsedActions,{'action': 'per_page'}).value;
-							var limitValue 		=	_.find(parsedActions,{'action': 'limit'}).value;
-							var skipValue 		=	_.find(parsedActions,{'action': 'skip'}).value;
-							var columnsValue 	=	_.find(parsedActions,{'action': 'columns'}).value;
-							
-							// create acs payload object
-							var acsPayload={};
-							acsPayload.classname=collectionName;
-
-							// assemble ACS Payload Object
-							if (orderValue !== null){
-								acsPayload.order=orderValue;
-							}
-							if (pageValue !== null){
-								acsPayload.page=pageValue;
-							}
-							if (per_pageValue !== null){
-								acsPayload.per_page=per_pageValue;
-							}
-							if (limitValue !== null){
-								acsPayload.limit=limitValue;
-							}
-							if (skipValue !== null){
-								acsPayload.skip=skipValue;
-							}
-							if (columnsValue !== null){
-								acsPayload.sel=JSON.stringify({"all":columnsValue.split(',')});	
-							}
-
-							// if there are get parameters, then add them as a where clause
-							if (getValue.toLowerCase() !== 'all'){
-								
-								// Now the hacky part:
-								// I replace all commas within quotes for their HTML value and then split by commas
-								whereArray=unescape(getValue).replace(/"[^"]*"/g, function(g0){return g0.replace(/,/g,'&#44');}).split(',');
-								// this helped: http://stackoverflow.com/questions/6335264/find-comma-in-quotes-with-regex-and-replace-with-html-equiv
+				//if (req.session.session_id){
+				if (fullPath.length >=3){
+					var parsedActions=parseActions(fullPath);
 					
-								getValues={};
-								
-								// loop through every option
-								whereArray.forEach(function(item){			
-									console.log(item);
-									var cond={};
-									var logicalOperators=['=','!=','>','>=','<','<='];
+					if (parsedActions !== null){
+						// get collection name from query string
+						collectionName=dataSetPrefix + fullPath[1].toLowerCase();
 
-									// Disclaimer: 
-									// this is problably not the best way of finding the 
-									// conditional operator...maybe matching with regex is a best approach
-									// let's just look at it as a proof of concept
-									logicalOperators.forEach(function(operator){
-										if (item.indexOf(operator) !== -1){
-											switch(operator){
-												case "=":
-													if (item.indexOf('!=') !== -1){
-														// if that equal sign is actually a not-equal
-														cond.$ne=item.split('!=')[1].replace('&#44',',').replace(/\"/g,'').trim()
-														getValues[item.split('!=')[0].trim()]=cond;
-													}else{
-														getValues[item.split(operator)[0].trim()]=item.split(operator)[1].replace('&#44',',').replace(/\"/g,'').trim();
-													}
-													break;
-												case ">":
-													cond.$gt=item.split(operator)[1].replace('&#44',',').replace(/\"/g,'').trim()
-													getValues[item.split(operator)[0].trim()]=cond;
-													break;
-												case ">=":
-													cond.$gte=item.split(operator)[1].replace('&#44',',').replace(/\"/g,'').trim()
-													getValues[item.split(operator)[0].trim()]=cond;
-													break;
-												case "<":
-													cond.$lt=item.split(operator)[1].replace('&#44',',').replace(/\"/g,'').trim()
-													getValues[item.split(operator)[0].trim()]=cond;
-													break;
-												case "<=":
-													cond.$lte=item.split(operator)[1].replace('&#44',',').replace(/\"/g,'').trim()
-													getValues[item.split(operator)[0].trim()]=cond;
-													break;
-												default:
-													if (operator !== '!='){
-														console.log('Invalid operator: ' + operator);
-													}
-											}
-										}
-									})
-								})
-								acsPayload.where=getValues;
-							}
-							//
-							
-							console.log('ACS Payload: ' + JSON.stringify(acsPayload));
+						// get values from querystring
+						var getValue 		=	_.find(parsedActions,{'action': 'get'}).value;
+						var orderValue		=	_.find(parsedActions,{'action': 'order'}).value;
+						var pageValue 		=	_.find(parsedActions,{'action': 'page'}).value;
+						var per_pageValue 	=	_.find(parsedActions,{'action': 'per_page'}).value;
+						var limitValue 		=	_.find(parsedActions,{'action': 'limit'}).value;
+						var skipValue 		=	_.find(parsedActions,{'action': 'skip'}).value;
+						var columnsValue 	=	_.find(parsedActions,{'action': 'columns'}).value;
+						
+						// create acs payload object
+						var acsPayload={};
+						acsPayload.classname=collectionName;
 
-							// let's do this!
-							ACS.Objects.query(acsPayload,
-								function(e){
-									var outData=e[collectionName];
-									res.send(JSON.stringify(outData));
-								}
-							)
-							//			
-						}else{
-							res.send({message:'Malformed URL.  Remember, value pairs'});	
+						// assemble ACS Payload Object
+						if (orderValue !== null){
+							acsPayload.order=orderValue;
 						}
+						if (pageValue !== null){
+							acsPayload.page=pageValue;
+						}
+						if (per_pageValue !== null){
+							acsPayload.per_page=per_pageValue;
+						}
+						if (limitValue !== null){
+							acsPayload.limit=limitValue;
+						}
+						if (skipValue !== null){
+							acsPayload.skip=skipValue;
+						}
+						if (columnsValue !== null){
+							acsPayload.sel=JSON.stringify({"all":columnsValue.split(',')});	
+						}
+
+						// if there are get parameters, then add them as a where clause
+						if (getValue.toLowerCase() !== 'all'){
+							
+							// Now the hacky part:
+							// I replace all commas within quotes for their HTML value and then split by commas
+							whereArray=unescape(getValue).replace(/"[^"]*"/g, function(g0){return g0.replace(/,/g,'&#44');}).split(',');
+							// this helped: http://stackoverflow.com/questions/6335264/find-comma-in-quotes-with-regex-and-replace-with-html-equiv
+				
+							getValues={};
+							
+							// loop through every option
+							whereArray.forEach(function(item){			
+								console.log(item);
+								var cond={};
+								var logicalOperators=['=','!=','>','>=','<','<='];
+
+								// Disclaimer: 
+								// this is problably not the best way of finding the 
+								// conditional operator...maybe matching with regex is a best approach
+								// let's just look at it as a proof of concept
+								logicalOperators.forEach(function(operator){
+									if (item.indexOf(operator) !== -1){
+										switch(operator){
+											case "=":
+												if (item.indexOf('!=') !== -1){
+													// if that equal sign is actually a not-equal
+													cond.$ne=item.split('!=')[1].replace('&#44',',').replace(/\"/g,'').trim()
+													getValues[item.split('!=')[0].trim()]=cond;
+												}else{
+													getValues[item.split(operator)[0].trim()]=item.split(operator)[1].replace('&#44',',').replace(/\"/g,'').trim();
+												}
+												break;
+											case ">":
+												cond.$gt=item.split(operator)[1].replace('&#44',',').replace(/\"/g,'').trim()
+												getValues[item.split(operator)[0].trim()]=cond;
+												break;
+											case ">=":
+												cond.$gte=item.split(operator)[1].replace('&#44',',').replace(/\"/g,'').trim()
+												getValues[item.split(operator)[0].trim()]=cond;
+												break;
+											case "<":
+												cond.$lt=item.split(operator)[1].replace('&#44',',').replace(/\"/g,'').trim()
+												getValues[item.split(operator)[0].trim()]=cond;
+												break;
+											case "<=":
+												cond.$lte=item.split(operator)[1].replace('&#44',',').replace(/\"/g,'').trim()
+												getValues[item.split(operator)[0].trim()]=cond;
+												break;
+											default:
+												if (operator !== '!='){
+													console.log('Invalid operator: ' + operator);
+												}
+										}
+									}
+								})
+							})
+							acsPayload.where=getValues;
+						}
+						//
+						
+						console.log('ACS Payload: ' + JSON.stringify(acsPayload));
+
+						// let's do this!
+						ACS.Objects.query(acsPayload,
+							function(e){
+								var outData=e[collectionName];
+								res.send(JSON.stringify(outData));
+							}
+						)
+						//			
 					}else{
-						res.send({message:'Need to provide Data-Store name and Action'});
+						res.send({message:'Malformed URL.  Remember, value pairs'});	
 					}
 				}else{
-					res.send({message:'Unauthorized access.  Please login first'});
+					res.send({message:'Need to provide Data-Store name and Action'});
 				}
-				break;
+			//}else{
+			//	res.send({message:'Unauthorized access.  Please login first'});
+			//}
+			break;
 		}
 	});
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -188,13 +191,23 @@ function start(app, express) {
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	// catch all route for HTTP POST
+	// here, instead of getting the ACTION from the URL, it should be by HTTP METHOD:
+	// 
+	// ACTION 		HTTP METHOD
+	// ==========================
+	// 	SET 		POST
+	// 	EDIT 		PUT
+	// 	DELETE 		DELETE
+	// 	
 	app.post('/api/*', function(req, res, next){
 		res.setHeader('Content-Type', 'application/json');
 		var fullPath=req.path.replace(/^\/|\/$/g,'').split('/');
 
 		if (fullPath.length >=3){
 			// get arguments from query string
-			collectionName=fullPath[1].toLowerCase();
+			
+			// Note: need to validate that collectionName follows naming conventions
+			collectionName=dataSetPrefix + fullPath[1].toLowerCase();
 			action=fullPath[2];
 
 			// set the ACS admin user, the one who can add records
@@ -212,7 +225,9 @@ function start(app, express) {
 					var objectToAdd=JSON.parse(objectToAdd);
 
 					// execute user-defined event
-					var isValid=_events.call('onset',collectionName,req.body.data);
+					// careful: if this is a new object, then we need to set default events
+					//var isValid=_events.call('onset',collectionName,req.body.data);
+					var isValid=true;
 					//
 					
 					if (isValid === true){
@@ -225,6 +240,8 @@ function start(app, express) {
 								    session_id:session_id // pass the freaking sessionId god dammit
 								}, function (e) {
 								    if (e.success) {
+								    	
+								    	// if it is new, add it to datasets on lilacs_config
 								        res.send({message:'Success'});
 								    } else {
 								        res.send({message:((e.error && e.message) || JSON.stringify(e))});
@@ -236,7 +253,7 @@ function start(app, express) {
 						res.send({message:isValid})
 					}
 					break;
-				case "EDIT":
+				case "EDIT": // should be PUT verb
 					var recToUpdate=req.body.id;
 					var objectToUpdate=req.body.data;
 					var objectToUpdate=JSON.parse(objectToUpdate);
@@ -259,7 +276,7 @@ function start(app, express) {
 						}
 					})
 					break;
-				case "DELETE":
+				case "DELETE": // should be DELETE verb
 					var objDelete={};
 					objDelete.classname=collectionName;
 

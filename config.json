@@ -2,7 +2,9 @@
   "routes":
   [
     { "path": "/", "callback": "application#index" },
-    { "path": "/admin", "callback": "admin#home" }
+    { "path": "/admin", "callback": "admin#home" },
+    { "path": "/admin/databrowser/:dataset", "callback": "admin#databrowser" },
+    { "path": "/admin/databrowser/:dataset/:currentpage", "callback": "admin#databrowser" }
   ],
   "filters":
   [
