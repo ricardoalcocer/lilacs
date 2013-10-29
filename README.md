@@ -55,16 +55,6 @@ $ acs run
 
 Once you have LilACS running, your backend is ready to start receiving requests at http://your_domain:port/api/xxxxx.  
 
-## Loggin in
-GET requests are protected, so you'll need to first login to the API so you can start fectching data.  The consumer user needs to be created in ACS firts.  Assuming the user is u=jack and p=bauer, you'd login in like this:
-
-```
-http://yourhost/api/login/jack,bauer
-```
-
-You'll receive a "Login successful"" response (or not).  A cookie-based session will be created for you and you're ready to start making GET calls. 
-
-**Note:  This feature has been very weakly tested.**
 
 ### The basics
 Records are added to **datasets**.  Your base url will allways be:
@@ -109,6 +99,8 @@ http://yourhost/api/employees/edit
 
 ```
 
+NOTE: This will be changed to the **PUT HTTP VERB** on top of **/api/dataset/**
+
 ### Deleting records
 
 To delete simply call **/delete** and **POST** the variable **id**, id being the id of the record to remove.  In case you wish to delete more than one record, sent the variable **ids** instead and all record ids separated by commas.
@@ -117,6 +109,8 @@ To delete simply call **/delete** and **POST** the variable **id**, id being the
 http://yourhost/api/employees/delete
 
 ```
+
+NOTE: This will be changed to the **DELETE HTTP VERB** on top of **/api/dataset/**
 
 ## Querying records
 
