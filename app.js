@@ -6,7 +6,7 @@
 */
 
 /**
-* REST-ish wrapper around Appcelerator Cloud Services.  Provides an instant API on 
+* REST wrapper around Appcelerator Cloud Services.  Provides an instant API on 
 * top of the CustomObjects data store
 */
 
@@ -15,204 +15,65 @@ var settings=require('./lib/lilacs.js').getSettings();
 var parseActions=require('./lib/lilacsmod.js').parseActions;
 var _events=require('./lib/lilacsevents.js');
 
-var ACS = require('acs').ACS;
-var ACS_KEY=settings.ACS_KEY;
-var ACS_SECRET=settings.ACS_SECRET;
+var DS=require('./lib/datasources/lilacs_acs.js').lilacs_acs;
+var dataSource=new DS();   
+
 
 var dataSetPrefix='lilacsds_';
 
 // initialize app
 function start(app, express) {
+	var ACS = require('acs').ACS;
+	var ACS_KEY=settings.ACS_KEY;
+	var ACS_SECRET=settings.ACS_SECRET;
+
 	app.use(express.favicon(__dirname + '/public/images/favicon.ico'));		//set favicon
 	app.use(express.session({ key: 'node.acs', secret: ACS_SECRET }));
 	ACS.init(ACS_KEY,ACS_SECRET);
 
-	// any request going to /api/* will go through here.  Every other will be handled by express
-
-	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	// catch all route for HTTP GET 
 	app.get('/api/*', function(req, res, next){
 		res.setHeader('Content-Type', 'application/json');
 		var fullPath=req.path.replace(/^\/|\/$/g,'').split('/');
-		
-		switch (fullPath[1].toLowerCase()){
-			// Login is required even for GET requests
-			/*case 'login':
-				if (fullPath[2]){
-					ACS.Users.login({
-						login: fullPath[2].split(',')[0],
-						password:fullPath[2].split(',')[1]
-					},function(e){
-						if (e.success){
-							req.session.session_id=e.meta.session_id;
-							res.send({message:'Login sucessfull'});
-						}else{
-							res.send({message:'Invalid user name and password'});
-						}
-					})
-				}else{
-					res.send({message:'No user name and password provided'});
-				}
-				break;
-			case 'logout':
-				ACS.Users.logout(function(e){
-					if (e.success){
-						req.session.session_id=null;
-						res.send({message:'Logout sucessfull'});		
-					}
-				})
-				break;*/
-			default:
-				//if (req.session.session_id){
-				if (fullPath.length >=3){
-					var parsedActions=parseActions(fullPath);
-					
-					if (parsedActions !== null){
-						// get collection name from query string
-						collectionName=dataSetPrefix + fullPath[1].toLowerCase();
+		if (fullPath.length >=3){
+			var parsedActions=parseActions(fullPath);
+			
+			if (parsedActions !== null){
+				// get collection name from query string
+				collectionName=dataSetPrefix + fullPath[1].toLowerCase();
 
-						// get values from querystring
-						var getValue 		=	_.find(parsedActions,{'action': 'get'}).value;
-						var orderValue		=	_.find(parsedActions,{'action': 'order'}).value;
-						var pageValue 		=	_.find(parsedActions,{'action': 'page'}).value;
-						var per_pageValue 	=	_.find(parsedActions,{'action': 'per_page'}).value;
-						var limitValue 		=	_.find(parsedActions,{'action': 'limit'}).value;
-						var skipValue 		=	_.find(parsedActions,{'action': 'skip'}).value;
-						var columnsValue 	=	_.find(parsedActions,{'action': 'columns'}).value;
-						
-						// create acs payload object
-						var acsPayload={};
-						acsPayload.classname=collectionName;
+				var args={
+					get: 		_.find(parsedActions,{'action': 'get'}).value,
+					order: 		_.find(parsedActions,{'action': 'order'}).value,
+					page: 		_.find(parsedActions,{'action': 'page'}).value,
+					perpage: 	_.find(parsedActions,{'action': 'per_page'}).value,
+					limit: 		_.find(parsedActions,{'action': 'limit'}).value,
+					skip: 		_.find(parsedActions,{'action': 'skip'}).value,
+					columns: 	_.find(parsedActions,{'action': 'columns'}).value
+				};
 
-						// assemble ACS Payload Object
-						if (orderValue !== null){
-							acsPayload.order=orderValue;
-						}
-						if (pageValue !== null){
-							acsPayload.page=pageValue;
-						}
-						if (per_pageValue !== null){
-							acsPayload.per_page=per_pageValue;
-						}
-						if (limitValue !== null){
-							acsPayload.limit=limitValue;
-						}
-						if (skipValue !== null){
-							acsPayload.skip=skipValue;
-						}
-						if (columnsValue !== null){
-							acsPayload.sel=JSON.stringify({"all":columnsValue.split(',')});	
-						}
-
-						// if there are get parameters, then add them as a where clause
-						if (getValue.toLowerCase() !== 'all'){
+				dataSource.GET(collectionName,args,function(data){
+					res.send(data);
+				});
 							
-							// Now the hacky part:
-							// I replace all commas within quotes for their HTML value and then split by commas
-							whereArray=unescape(getValue).replace(/"[^"]*"/g, function(g0){return g0.replace(/,/g,'&#44');}).split(',');
-							// this helped: http://stackoverflow.com/questions/6335264/find-comma-in-quotes-with-regex-and-replace-with-html-equiv
-				
-							getValues={};
-							
-							// loop through every option
-							whereArray.forEach(function(item){			
-								console.log(item);
-								var cond={};
-								var logicalOperators=['=','!=','>','>=','<','<='];
-
-								// Disclaimer: 
-								// this is problably not the best way of finding the 
-								// conditional operator...maybe matching with regex is a best approach
-								// let's just look at it as a proof of concept
-								logicalOperators.forEach(function(operator){
-									if (item.indexOf(operator) !== -1){
-										switch(operator){
-											case "=":
-												if (item.indexOf('!=') !== -1){
-													// if that equal sign is actually a not-equal
-													cond.$ne=item.split('!=')[1].replace('&#44',',').replace(/\"/g,'').trim()
-													getValues[item.split('!=')[0].trim()]=cond;
-												}else{
-													getValues[item.split(operator)[0].trim()]=item.split(operator)[1].replace('&#44',',').replace(/\"/g,'').trim();
-												}
-												break;
-											case ">":
-												cond.$gt=item.split(operator)[1].replace('&#44',',').replace(/\"/g,'').trim()
-												getValues[item.split(operator)[0].trim()]=cond;
-												break;
-											case ">=":
-												cond.$gte=item.split(operator)[1].replace('&#44',',').replace(/\"/g,'').trim()
-												getValues[item.split(operator)[0].trim()]=cond;
-												break;
-											case "<":
-												cond.$lt=item.split(operator)[1].replace('&#44',',').replace(/\"/g,'').trim()
-												getValues[item.split(operator)[0].trim()]=cond;
-												break;
-											case "<=":
-												cond.$lte=item.split(operator)[1].replace('&#44',',').replace(/\"/g,'').trim()
-												getValues[item.split(operator)[0].trim()]=cond;
-												break;
-											default:
-												if (operator !== '!='){
-													console.log('Invalid operator: ' + operator);
-												}
-										}
-									}
-								})
-							})
-							acsPayload.where=getValues;
-						}
-						//
-						
-						console.log('ACS Payload: ' + JSON.stringify(acsPayload));
-
-						// let's do this!
-						ACS.Objects.query(acsPayload,
-							function(e){
-								var outData=e[collectionName];
-								res.send(JSON.stringify(outData));
-							}
-						)
-						//			
-					}else{
-						res.send({message:'Malformed URL.  Remember, value pairs'});	
-					}
-				}else{
-					res.send({message:'Need to provide Data-Store name and Action'});
-				}
-			//}else{
-			//	res.send({message:'Unauthorized access.  Please login first'});
-			//}
-			break;
+			}else{
+				res.send({message:'Malformed URL.  Remember, value pairs'});	
+			}
+		}else{
+			res.send({message:'Need to provide Data-Store name and Action'});
 		}
 	});
-	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	
 
-	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	// catch all route for HTTP POST
-	// here, instead of getting the ACTION from the URL, it should be by HTTP METHOD:
-	// 
-	// ACTION 		HTTP METHOD
-	// ==========================
-	// 	SET 		POST
-	// 	EDIT 		PUT
-	// 	DELETE 		DELETE
-	// 	
+	// ##
+
 	app.post('/api/*', function(req, res, next){
 		res.setHeader('Content-Type', 'application/json');
 		var fullPath=req.path.replace(/^\/|\/$/g,'').split('/');
 
 		if (fullPath.length >=3){
-			// get arguments from query string
-			
 			// Note: need to validate that collectionName follows naming conventions
 			collectionName=dataSetPrefix + fullPath[1].toLowerCase();
 			action=fullPath[2];
 
-			// set the ACS admin user, the one who can add records
-			// this could also come from the querystring, allowing for 
-			// more granular ownership of records...but that's not implemented
 			var adminUser={
 				login:settings.ADMIN_UID,
 				password:settings.ADMIN_PWD
@@ -220,82 +81,41 @@ function start(app, express) {
 
 			// react accordingly
 			switch(action.toUpperCase()){
-				case "SET":
-					var objectToAdd=req.body.data;
-					var objectToAdd=JSON.parse(objectToAdd);
-
-					// execute user-defined event
-					// careful: if this is a new object, then we need to set default events
-					//var isValid=_events.call('onset',collectionName,req.body.data);
-					var isValid=true;
-					//
-					
-					if (isValid === true){
-						ACS.Users.login(adminUser,function(e){
-							var session_id=e.meta.session_id;
-							if (e.success){
-								ACS.Objects.create({
-								    classname: collectionName,
-								    fields: objectToAdd,
-								    session_id:session_id // pass the freaking sessionId god dammit
-								}, function (e) {
-								    if (e.success) {
-								    	
-								    	// if it is new, add it to datasets on lilacs_config
-								        res.send({message:'Success'});
-								    } else {
-								        res.send({message:((e.error && e.message) || JSON.stringify(e))});
-								    }
-								});
-							}
-						})
-					}else{
-						res.send({message:isValid})
+				case "SET": // should be the POST verb
+					var args={
+						objectToAdd : JSON.parse(req.body.data),
+						adminUser: adminUser
 					}
+
+					dataSource.POST(collectionName,args,function(data){
+						res.send(data);
+					});
+					
 					break;
 				case "EDIT": // should be PUT verb
-					var recToUpdate=req.body.id;
-					var objectToUpdate=req.body.data;
-					var objectToUpdate=JSON.parse(objectToUpdate);
+					var args={
+						adminUser: adminUser,
+						recToUpdate: req.body.id,
+						objectToUpdate: JSON.parse(req.body.data)
+					}
 
-					ACS.Users.login(adminUser,function(e){
-						var session_id=e.meta.session_id;
-						if (e.success){
-							ACS.Objects.update({
-							    classname: collectionName,
-							    id:recToUpdate,
-							    fields: objectToUpdate,
-							    session_id:session_id // pass the freaking sessionId god dammit
-							}, function (e) {
-							    if (e.success) {
-							        res.send({message:'Success'});
-							    } else {
-							        res.send({message:((e.error && e.message) || JSON.stringify(e))});
-							    }
-							});
-						}
-					})
+					dataSource.PUT(collectionName,args,function(data){
+						res.send(data);
+					});
+
 					break;
 				case "DELETE": // should be DELETE verb
-					var objDelete={};
-					objDelete.classname=collectionName;
-
 					if (req.body.ids || req.body.id){
-						if (req.body.id) {objDelete.id=req.body.id} else {objDelete.ids=req.body.ids};
-					
-						ACS.Users.login(adminUser,function(e){
-							var session_id=e.meta.session_id;
-							if (e.success){
-								objDelete.session_id=session_id // pass the freaking sessionId god dammit
-								ACS.Objects.remove(objDelete, function (e) {
-								    if (e.success) {
-								        res.send({message:'Success'});
-								    } else {
-								        res.send({message:((e.error && e.message) || JSON.stringify(e))});
-								    }
-								});
-							}
-						})
+						var args={
+							id: req.body.id,
+							ids: req.body.ids,
+							adminUser:adminUser
+						}
+
+						dataSource.DELETE(collectionName,args,function(data){
+							res.send(data);
+						});		
+										
 					}else{
 						res.send('You want to delete, but you don\'t tell me what?')
 					}
@@ -307,7 +127,6 @@ function start(app, express) {
 			res.send({message:'Need to provide Class Name and Action'});
 		}
 	});
-	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }
 
 // release resources
