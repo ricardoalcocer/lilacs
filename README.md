@@ -55,17 +55,6 @@ $ acs run
 
 Once you have LilACS running, your backend is ready to start receiving requests at http://your_domain:port/api/xxxxx.  
 
-## Loggin in
-GET requests are protected, so you'll need to first login to the API so you can start fectching data.  The consumer user needs to be created in ACS firts.  Assuming the user is u=jack and p=bauer, you'd login in like this:
-
-```
-http://yourhost/api/login/jack,bauer
-```
-
-You'll receive a "Login successful"" response (or not).  A cookie-based session will be created for you and you're ready to start making GET calls. 
-
-**Note:  This feature has been very weakly tested.**
-
 ### The basics
 Records are added to **datasets**.  Your base url will allways be:
 
