@@ -1,6 +1,6 @@
 <center><img src="https://raw.github.com/ricardoalcocer/lilacs/master/public/images/retro_flower_1_color_colour_lilac_peace-999px.png" width="200">
 
-<h1>LilACS</h1>
+<h1>LilACS (Beta)</h1>
 
 </center>
 

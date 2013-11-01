@@ -24,8 +24,12 @@
         <ul class="sidebar-nav">
           <li class="sidebar-brand"><a href="/admin">LilACS - Dashboard</a></li>
           <li><h4>Datasets</h4></li>
+          <% if (datasets instanceof Array) {%>
           <% datasets.forEach(function(item){ %>
             <li><a href="/admin/databrowser/<%=item%>"><%= item %></a></li>
           <% }) %>
+          <% }else{%>
+            <li>No datasets</li>
+          <% } %>
         </ul>
       </div>

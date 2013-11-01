@@ -1,10 +1,15 @@
 var ACS=require('acs').ACS;
 //var settings=require('../lib/lilacs.js').getSettings();
-var lilacsmod=require('../lib/lilacsmod.js');
+
+//var lilacsmod=require('../lib/datasources/lilacs_acs.js');
+
+var DS=require('../lib/datasources/lilacs_acs.js').lilacs_acs;
+var dataSource=new DS();   
+
 var dataSetPrefix='lilacsds_';
 
 function home(req, res) {
-	lilacsmod.getDataSets(function(datasets){
+	dataSource.getDataSets(function(datasets){
 		req.session.datasets=datasets;  //make sure it is saved as a session
 		res.render('adminhome',{
 										datasets:datasets
@@ -15,7 +20,7 @@ function home(req, res) {
 }
 
 function databrowser(req,res){
-	lilacsmod.getDataSets(function(datasets){
+	dataSource.getDataSets(function(datasets){
 		req.session.datasets=datasets; // make sure it is saved as a session
 		var perpage=10;
 		var currentpage=req.params.currentpage || 1;
