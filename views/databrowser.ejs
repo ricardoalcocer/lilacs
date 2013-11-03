@@ -1,10 +1,10 @@
 <% include header.ejs %> 
 
 <script type="text/javascript">
-function deleterec(id){
+function deleterec(id,hmac,dataset){
   var response=confirm("Delete this record");
   if (response==true){
-    alert('Sorry, not implemented');
+    location.href='../delete/' + id + '/' + hmac + '/' + dataset;
   }
 }
 </script>
@@ -47,7 +47,7 @@ function deleterec(id){
                             <% } %>
                             <td style="text-align: center">
                               <div class="btn-group btn-group-sm">
-                                <button type="button" class="btn btn-default" onClick="deleterec('<%= item.id %>');"><i class="icon-remove-sign"></i></button>
+                                <button type="button" class="btn btn-default" onClick="deleterec('<%= item.id %>','<%=item.hmac%>','<%=dataset%>');"><i class="icon-remove-sign"></i></button>
                               </div>
                             </td>
                           </tr>
