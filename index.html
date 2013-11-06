@@ -28,37 +28,193 @@
     <div id="content-wrapper">
       <div class="inner clearfix">
         <section id="main-content">
-          <h3>
-<a name="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages"><span class="octicon octicon-link"></span></a>Welcome to GitHub Pages.</h3>
+          <p></p><img src="https://raw.github.com/ricardoalcocer/lilacs/master/public/images/retro_flower_1_color_colour_lilac_peace-999px.png" width="200"><h1>
+<a name="lilacs-beta" class="anchor" href="#lilacs-beta"><span class="octicon octicon-link"></span></a>LilACS (Beta)</h1>
 
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
+<p></p>
 
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
+<p>LilACS (Li'l ACS) is a combiantion of Node.ACS (to expose an API) + ACS (as a data store), that will provide you with an instant API for you mobile or web app.</p>
+
+<hr><h1>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h1>
+
+<hr><p>The steps to get LilACS are:</p>
+
+<h2>
+<a name="1-install-acs-if-you-dont-already-have-it" class="anchor" href="#1-install-acs-if-you-dont-already-have-it"><span class="octicon octicon-link"></span></a>1. Install ACS if you don't already have it:</h2>
+
+<pre><code>$ [sudo] npm install acs -g
 </code></pre>
 
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
+<h2>
+<a name="2-login-to-acs" class="anchor" href="#2-login-to-acs"><span class="octicon octicon-link"></span></a>2. Login to ACS:</h2>
+
+<pre><code>$ acs login
+</code></pre>
+
+<h2>
+<a name="3-create-acs-app" class="anchor" href="#3-create-acs-app"><span class="octicon octicon-link"></span></a>3. Create ACS App</h2>
+
+<p>Go to <a href="https://my.appcelerator.com/apps">https://my.appcelerator.com/apps</a> and create an ACS-only app.  Open this app, create an admin user and grab the ACS Key and ACS Secret</p>
+
+<h2>
+<a name="4-clone-lilacs" class="anchor" href="#4-clone-lilacs"><span class="octicon octicon-link"></span></a>4. Clone LilACS</h2>
+
+<pre><code>$ git clone https://github.com/ricardoalcocer/lilacs.git
+</code></pre>
+
+<h2>
+<a name="5-add-settings" class="anchor" href="#5-add-settings"><span class="octicon octicon-link"></span></a>5. Add settings</h2>
+
+<p>Open <strong>/lib/lilacs_template.js</strong> and add your ACS Keys and admin user info.  Save this file as <strong>/lib/lilacs.js</strong></p>
+
+<h2>
+<a name="6-launch-and-turn" class="anchor" href="#6-launch-and-turn"><span class="octicon octicon-link"></span></a>6. Launch and turn</h2>
+
+<ul>
+<li>From a terminal, go to your project folder and run it: </li>
+</ul><pre><code>$ acs run
+</code></pre>
+
+<ul>
+<li>Point your browser to http://localhost:8080.  LilACS should be running</li>
+</ul><hr><h1>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h1>
+
+<hr><p>Once you have LilACS running, your backend is ready to start receiving requests at http://your_domain:port/api/xxxxx.  </p>
 
 <h3>
-<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>Designer Templates</h3>
+<a name="the-basics" class="anchor" href="#the-basics"><span class="octicon octicon-link"></span></a>The basics</h3>
 
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
+<p>Records are added to <strong>datasets</strong>.  Your base url will allways be:</p>
 
-<h3>
-<a name="rather-drive-stick" class="anchor" href="#rather-drive-stick"><span class="octicon octicon-link"></span></a>Rather Drive Stick?</h3>
+<pre><code>http://yourhost/api
+</code></pre>
 
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
+<p>The next querystring parameter is the <strong>dataset</strong>, so if your <strong>dataset</strong> is employees, your URL will be:</p>
 
-<h3>
-<a name="authors-and-contributors" class="anchor" href="#authors-and-contributors"><span class="octicon octicon-link"></span></a>Authors and Contributors</h3>
-
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
+<pre><code>http://yourhost/api/employees
+</code></pre>
 
 <h3>
-<a name="support-or-contact" class="anchor" href="#support-or-contact"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
+<a name="adding-records" class="anchor" href="#adding-records"><span class="octicon octicon-link"></span></a>Adding records</h3>
 
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
+<p>Records are added via HTTP Post.  Simply post a JavaScript Object in the <strong>data</strong> variable to http://yourhost/api/set.  For example:</p>
+
+<p>Example object:</p>
+
+<pre><code>{
+    name: 'Ricardo',
+    lname: 'Alcocer,
+    department: 'Finance'
+}
+</code></pre>
+
+<p>To add this record to the employee <strong>dataset</strong>, simply <strong>POST</strong> the data via HTTP.  Data needs to be sent in a variable named <strong>data</strong>.</p>
+
+<pre><code>http://yourhost/api/employees/set
+
+</code></pre>
+
+<h3>
+<a name="updating-records" class="anchor" href="#updating-records"><span class="octicon octicon-link"></span></a>Updating records</h3>
+
+<p>Updating is similar to Adding, but simply call <strong>/edit</strong> and <strong>POST</strong> the variable <strong>id</strong> along with <strong>data</strong>, id being the id of the record to update.  Your record will be replaced with the newly posted one.</p>
+
+<pre><code>http://yourhost/api/employees/edit
+
+</code></pre>
+
+<h3>
+<a name="deleting-records" class="anchor" href="#deleting-records"><span class="octicon octicon-link"></span></a>Deleting records</h3>
+
+<p>To delete simply call <strong>/delete</strong> and <strong>POST</strong> the variable <strong>id</strong>, id being the id of the record to remove.  In case you wish to delete more than one record, sent the variable <strong>ids</strong> instead and all record ids separated by commas.</p>
+
+<pre><code>http://yourhost/api/employees/delete
+
+</code></pre>
+
+<h2>
+<a name="querying-records" class="anchor" href="#querying-records"><span class="octicon octicon-link"></span></a>Querying records</h2>
+
+<p>Right after adding your first record, a full REST API will be exposed to you to manage the data, in our example located at:</p>
+
+<pre><code>http://yourhost/api/employees/get/all
+</code></pre>
+
+<p><strong>LilACS</strong> exposes the following arguments from the ACS 'query' method:</p>
+
+<ul>
+<li>where (exposed as get. allows comma-separated list of value-pairs)</li>
+<li>classname (exposed as the first paramenter after /api)</li>
+<li>order (allows comma-separated list of columns and minus sign (-) for inverse sort order)</li>
+<li>page</li>
+<li>per_page</li>
+<li>limit</li>
+<li>skip</li>
+<li>columns (allows comma-separated list of columns to get in your result set)</li>
+</ul><h2>
+<a name="use-cases" class="anchor" href="#use-cases"><span class="octicon octicon-link"></span></a>Use-cases</h2>
+
+<p><strong>Get all records from employees where department='Finance'</strong></p>
+
+<pre><code>http://yourhost/api/employees/get/department='Finance'
+</code></pre>
+
+<p><strong>Get all employees ordered by name</strong></p>
+
+<pre><code>http://yourhost/api/employees/get/all/order/name
+</code></pre>
+
+<p><strong>Get all employees ordered by name but only the id and name columns</strong></p>
+
+<pre><code>http://yourhost/api/employees/get/all/order/name/columns/id,name
+</code></pre>
+
+<p><strong>Get all employees where name='Ricardo' and order by creation date descending</strong></p>
+
+<pre><code>http://yourhost/api/employees/name="Ricardo"/order/-created_at
+</code></pre>
+
+<p><strong>Get all employees where name="Ricardo" and department="Finance" order by creation date descending</strong></p>
+
+<pre><code>http://yourhost/api/employees/name="Ricardo",department="Finance"/order/-created_at
+</code></pre>
+
+<p>Note: Allowed logical operators are: =, &gt;, &lt;, &gt;=, &lt;= and !=</p>
+
+<p><strong>Pagination : Previous example, but in pages of 10 records each</strong></p>
+
+<pre><code>http://yourhost/api/employees/name='Ricardo'/order/-created_at/per_page/10/page/1
+</code></pre>
+
+<p><strong>NOTE</strong>
+Querystring parameters are value pairs, for example when querying a page, the URL looks like <strong>/page/1</strong>, where page is the variable and 1 is the value.  In case a parameter can receive multiple values, they are separated by commas.</p>
+
+<hr><h1>
+<a name="stuff-to-do-and-in-the-works" class="anchor" href="#stuff-to-do-and-in-the-works"><span class="octicon octicon-link"></span></a>Stuff to-do and in-the-works</h1>
+
+<hr><h2>
+<a name="events" class="anchor" href="#events"><span class="octicon octicon-link"></span></a>Events</h2>
+
+<p>Mechanism for adding onSet, onEdit, onValidate, onDelete events.  Initial tests are located in the file <strong>/lib/lilacsevents</strong>.js</p>
+
+<h2>
+<a name="databrowser" class="anchor" href="#databrowser"><span class="octicon octicon-link"></span></a>Databrowser</h2>
+
+<p>Provide an admin insterface for adminsitering records and events.  Initial tests are located at http://yourhost/admin.</p>
+
+<hr><h1>
+<a name="contribuitors" class="anchor" href="#contribuitors"><span class="octicon octicon-link"></span></a>Contribuitors</h1>
+
+<hr><ul>
+<li>Ricardo Alcocer</li>
+</ul><p>Pull requests are encouraged</p>
+
+<hr><h1>
+<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h1>
+
+<hr><p>Licensed under the terms of the MIT License | <a href="http://alco.mit-license.org/">http://alco.mit-license.org/</a></p>
         </section>
 
         <aside id="sidebar">
