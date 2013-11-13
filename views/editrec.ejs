@@ -1,0 +1,57 @@
+<% include header.ejs %> 
+        <!-- Page content -->
+        <div id="page-content-wrapper">
+          <div class="content-header">
+            <h1>
+              <a id="menu-toggle" href="#" class="btn btn-default"><i class="icon-reorder"></i></a>
+              <!-- <a href="javascript:window.history.back()"><i class="icon-chevron-left"></i></a> Edit -->
+              Edit
+
+            </h1>
+          </div>
+          <!-- Keep all page content within the page-content inset div! -->
+          <div class="page-content inset">
+            <div class="row">
+              <div class="col-md-12">
+                <p>To preserve data-type integrity, make sure you represent arrays and objects using square and curly brackets respectively.</p>
+                <div style="height:400px;width:100%">
+                  <form role="form" method="post" action="../save">
+                    <input type="hidden" name="dataset" value="<%=dataset%>" />
+                    <input type="hidden" name="id" value="<%= thisrec.id %>" />
+                    
+                    <% columns.forEach(function(item){ %>
+
+                    <div class="form-group">
+                      <label for="<%= item %>"><%= item %></label>
+
+                      <% var tmp=thisrec[item] %>
+                      <b>(<% if (typeof thisrec[item] == 'object'){ %>
+                        <% if(thisrec[item] instanceof Array){ %>
+                          <% tmp=JSON.stringify(thisrec[item]) %>
+                          Array
+                        <% }else{ %>
+                          <% tmp=JSON.stringify(thisrec[item]) %>
+                          Hash
+                        <% } %>  
+                      <% }else{ %>
+                      <%= typeof thisrec[item] %> 
+                      <% } %>)</b>
+
+                      <input type="text" class="form-control" name="<%= item %>" id="<%= item %>" value="<%= tmp %>" 
+
+                      <% if (item === 'id' || item === 'created_at' || item === 'updated_at') {%>
+                        disabled />
+                      <% }else{ %>
+                        />
+                      <% } %>
+                    </div>
+                    <% }) %>
+                    <button type="submit" class="btn btn-default">Save</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+<% include footer.ejs %>

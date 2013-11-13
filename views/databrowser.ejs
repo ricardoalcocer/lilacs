@@ -7,72 +7,85 @@ function deleterec(id,hmac,dataset){
     location.href='../delete/' + id + '/' + hmac + '/' + dataset;
   }
 }
+
+function editrec(id){
+  alert('edit/' + id);
+  location.href='edit/' + id;  
+}
 </script>
 
-<%
-  // show 5 columns by default, otherwise, show as all
-  var totalColumns=5;  
-  if (columns.length < totalColumns){
-    totalColumns=columns.length
-  }
-%>
-        <!-- Page content -->
-        <div id="page-content-wrapper">
-          <div class="content-header">
-            <h1>
-              <a id="menu-toggle" href="#" class="btn btn-default"><i class="icon-reorder"></i></a>
-              <%= dataset %>
-            </h1>
-          </div>
-          <!-- Keep all page content within the page-content inset div! -->
-          <div class="page-content inset">
-            <div class="row">
-              <div class="col-md-12">
-                <div style="height:400px;width:100%">
-                  <div class="table-responsive">
-                    <table class="table  table-hover table-bordered">
-                      <thead>
-                          <tr>
-                            <% for (var i=0;i<totalColumns;i++){ %>
-                              <th><%= columns[i] %></th>
-                            <% } %>
-                            <th></th>
-                          </tr>
-                      </thead>
-                      <tbody>
-                      <% data.forEach(function(item){ %>
-                          <tr>
-                            <% for (var i=0;i<totalColumns;i++){ %>
-                              <td><%= JSON.stringify(item[columns[i]])%></td>
-                            <% } %>
-                            <td style="text-align: center">
-                              <div class="btn-group btn-group-sm">
-                                <button type="button" class="btn btn-default" onClick="deleterec('<%= item.id %>','<%=item.hmac%>','<%=dataset%>');"><i class="icon-remove-sign"></i></button>
-                              </div>
-                            </td>
-                          </tr>
-                      <% }) %>
-                      </tbody>
-                    </table>
-                  </div>
-                  <ul class="pagination pagination-sm">
-                    <!--<li><a href="/admin/databrowser/<%= dataset %>/1">&laquo;</a></li>-->
-                
-                    <% for (i=1;i<=totalpages;i++){ %>
-                      <% if (currentpage == i) {%>
-                      <li class="active">
-                      <% }else{ %>
-                      <li>
+<div id="page-content-wrapper">
+    <div class="content-header">
+      <h1>
+        <a id="menu-toggle" href="#" class="btn btn-default"><i class="icon-reorder"></i></a>
+        <%= dataset %>
+      </h1>
+    </div>
+    <!-- Keep all page content within the page-content inset div! -->
+    <div class="page-content inset">
+      <div class="row">
+        <div class="col-md-12">
+          <div style="height:400px;width:100%">
+            <div class="table-responsive">
+
+<% if (data.length > 0){ %>
+  <%
+    // show 5 columns by default, otherwise, show as all
+    var totalColumns=5;  
+    if (columns.length < totalColumns){
+      totalColumns=columns.length
+    }
+  %>
+  <!-- Page content -->
+  
+              <table class="table  table-hover table-bordered">
+                <thead>
+                    <tr>
+                      <% for (var i=0;i<totalColumns;i++){ %>
+                        <th><%= columns[i] %></th>
                       <% } %>
-                      <a href="/admin/databrowser/<%= dataset %>/<%= i %>"><%= i %> </a></li>
-                    <% } %>
-                    <!--<li><a href="/admin/databrowser/<%= dataset %>/<%= totalpages %>">&raquo;</a></li> -->
-                    </ul>
-                </div>
-              </div>
+                      <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                <% data.forEach(function(item){ %>
+                    <tr>
+                      <% for (var i=0;i<totalColumns;i++){ %>
+                        <td><a href="<%=dataset%>/edit/<%=item.id%>"><%= JSON.stringify(item[columns[i]])%></a></td>
+                      <% } %>
+                      <td style="text-align: center">
+                        <div class="btn-group btn-group-sm">
+                          <button type="button" class="btn btn-default" onClick="deleterec('<%= item.id %>','<%=item.hmac%>','<%=dataset%>');"><i class="icon-remove-sign"></i></button>
+                        </div>
+                      </td>
+                    </tr>
+                <% }) %>
+                </tbody>
+              </table>
             </div>
+            <ul class="pagination pagination-sm">
+              <!--<li><a href="/admin/databrowser/<%= dataset %>/1">&laquo;</a></li>-->
+          
+              <% for (i=1;i<=totalpages;i++){ %>
+                <% if (currentpage == i) {%>
+                <li class="active">
+                <% }else{ %>
+                <li>
+                <% } %>
+                <a href="/admin/databrowser/<%= dataset %>/<%= i %>"><%= i %> </a></li>
+              <% } %>
+              <!--<li><a href="/admin/databrowser/<%= dataset %>/<%= totalpages %>">&raquo;</a></li> -->
+              </ul>
           </div>
+  
+<% }else{ %>
+  <p>There are no more records on this data set</p>
+<% } %> 
+
         </div>
       </div>
+    </div>
+  </div>
+</div>
 
 <% include footer.ejs %>

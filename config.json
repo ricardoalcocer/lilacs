@@ -1,11 +1,13 @@
 {
   "routes":
   [
-    { "path": "/", "callback": "application#index" },
-    { "path": "/admin", "callback": "admin#home" },
-    { "path": "/admin/databrowser/:dataset", "callback": "admin#databrowser" },
-    { "path": "/admin/databrowser/:dataset/:currentpage", "callback": "admin#databrowser" },
-    { "path": "/admin/delete/:recid/:hash/:dataset", "callback": "admin#deleterec" }
+    { "path": "/",                                            "callback": "application#index"                   },
+    { "path": "/admin",                                       "callback": "admin#home"                          },
+    { "path": "/admin/databrowser/:dataset",                  "callback": "admin#databrowser"                   },
+    { "path": "/admin/databrowser/:dataset/:currentpage",     "callback": "admin#databrowser"                   },
+    { "path": "/admin/databrowser/:dataset/edit/:recid",      "callback": "admin#editform"                      },
+    { "path": "/admin/databrowser/:dataset/save",             "callback": "admin#saveeditform", "method":"post" },
+    { "path": "/admin/delete/:recid/:hash/:dataset",          "callback": "admin#deleterec"                     }
   ],
   "filters":
   [

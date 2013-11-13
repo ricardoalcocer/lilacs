@@ -40,13 +40,21 @@ $ git clone https://github.com/ricardoalcocer/lilacs.git
 
 Open **/lib/lilacs_template.js** and add your ACS Keys and admin user info.  Save this file as **/lib/lilacs.js**
 
-## 6. Launch and turn
+## 6. Launch and run
 * From a terminal, go to your project folder and run it: 
 
 ```
 $ acs run
 ```
 * Point your browser to http://localhost:8080.  LilACS should be running
+
+## 7. When ready to publish
+
+```
+$ acs publish --force
+```
+
+ACS will return a public URL for your API.
 
 
 ---
@@ -167,15 +175,15 @@ http://yourhost/api/employees/name='Ricardo'/order/-created_at/per_page/10/page/
 **NOTE**
 Querystring parameters are value pairs, for example when querying a page, the URL looks like **/page/1**, where page is the variable and 1 is the value.  In case a parameter can receive multiple values, they are separated by commas.
 
+# Databrowser
+A data browser is provided at http://yourhost/admin.  You can browse through your datasets, edit and delete data.
+
 ---
 # Stuff to-do and in-the-works
 ---
 
 ## Events
 Mechanism for adding onSet, onEdit, onValidate, onDelete events.  Initial tests are located in the file **/lib/lilacsevents**.js
-
-## Databrowser
-Provide an admin insterface for adminsitering records and events.  Initial tests are located at http://yourhost/admin.
 
 ---
 # Contribuitors

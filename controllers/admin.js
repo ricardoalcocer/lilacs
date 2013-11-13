@@ -42,11 +42,9 @@ function databrowser(req,res){
 				outData.forEach(function(row){
 					row.hmac=crypto.createHmac("sha1",settings.ACS_SECRET).update(row.id).digest("hex");
 					rows.push(row);
-					//console.log(row);
 				})
 				
-				if(outData.length>0){
-					var columns=Object.keys(outData[0]);
+				if (outData.length>0) var columns=Object.keys(outData[0]);
 					res.render('databrowser', { 
 												dataset: req.params.dataset, 
 												data: rows , 
@@ -55,16 +53,12 @@ function databrowser(req,res){
 												currentpage: currentpage,
 												datasets:datasets
 											});
-				}else{
-					res.send('no data.  Need to create a prettier message');
-				}
 			}
 		)
 	},req)
 }
 
 function deleterec(req,res){
-	// rec is at req.params.recid and HMAC for that id is at req.params.hmac
 	// if HMAC matches, delete freely
 	if (req.params.hash === crypto.createHmac("sha1",settings.ACS_SECRET).update(req.params.recid).digest("hex")){
 		var adminUser={
@@ -81,16 +75,132 @@ function deleterec(req,res){
 				objDelete.session_id=session_id; // pass the freaking sessionId god dammit
 				objDelete.classname=dataSetPrefix + req.params.dataset;
 				ACS.Objects.remove(objDelete, function (e) {
-				    if (e.success) {
-				    	// ok boys, if we deleted the last record of this collection we should redirect to /admin.  Otherwise, redirect to the dataset screen
-						res.redirect('../../../../databrowser/' + req.params.dataset);
-						console.log('Success');
-				    } else {
-				    	res.redirect('../../../../databrowser/' + req.params.dataset);
-				    	console.log({message:((e.error && e.message) || JSON.stringify(e))});
-				    }
+					// now check if there are still records for this dataset
+			    	ACS.Objects.query({
+			    		classname:dataSetPrefix + req.params.dataset
+			    	},function(e){
+			    		if(e[dataSetPrefix + req.params.dataset].length === 0){
+			    			// remove this dataset from lilacs_config
+			    			deleteDataSet(req.params.dataset);
+			    		}
+			    	});
+					res.redirect('../../../../databrowser/' + req.params.dataset);
 				});
 			}
 		})
 	}
+}
+
+function deleteDataSet(dataset){
+	var classname='lilacs_config'
+
+	var adminUser={
+		login:settings.ADMIN_UID,
+		password:settings.ADMIN_PWD
+	}
+
+	ACS.Objects.query({
+		classname:classname
+	},function(e){
+		var datasets=e[classname][0].datasets;
+		var recid=e[classname][0].id;
+		var position=datasets.indexOf(dataset);
+		if (position > -1) {
+		    datasets.splice(position, 1);
+		}
+		
+		var payload={
+			datasets:datasets
+		}
+
+		// now update the array on the server
+		ACS.Users.login(adminUser,function(e){
+			var session_id=e.meta.session_id;
+			if (e.success){
+				ACS.Objects.update({
+				    classname: classname,
+				    id: recid,
+				    fields: payload,
+				    session_id:session_id // pass the freaking sessionId god dammit
+				}, function (e) {
+				    if (e.success) {
+				        //console.log('success');
+				    } else {
+				    	//var response={message:((e.error && e.message) || JSON.stringify(e))}
+				        //console.log(response);
+				    }
+				});
+			}
+		})
+	})
+}
+
+function editform(req,res){
+	dataSource.getDataSets(function(datasets){
+		req.session.datasets=datasets;  //make sure it is saved as a session
+
+		ACS.Objects.show({
+			classname:dataSetPrefix + req.params.dataset,
+			id:req.params.recid,			
+			unsel:JSON.stringify({"all":"user"}) // don't get info about the user	
+		},function(e){
+			res.render('editrec',{
+				dataset:req.params.dataset,
+				datasets:datasets,
+				columns: Object.keys(e[dataSetPrefix + req.params.dataset][0]),
+				thisrec:e[dataSetPrefix + req.params.dataset][0]
+			});
+		})
+	},req)
+}
+
+function saveeditform(req,res){
+	// edit the record
+	var tmpObj=req.body;
+	var cols=Object.keys(tmpObj);
+	var obj={};
+
+	cols.forEach(function(item){
+		if (item !== 'id' || item !== 'dataset'){
+			// parse in case it is an array or a hash
+			try{
+				obj[item]=JSON.parse(tmpObj[item]);
+			}catch(e){
+				obj[item]=tmpObj[item];				
+			}
+		}
+	});
+	var recId=tmpObj.id;
+	var dataset=tmpObj.dataset;
+
+	// remove unwanted fields
+	delete obj['id'];
+	delete obj['dataset'];
+	//
+
+	var adminUser={
+		login:settings.ADMIN_UID,
+		password:settings.ADMIN_PWD
+	}
+
+	ACS.Users.login(adminUser,function(e){
+		var session_id=e.meta.session_id;
+		var payload={
+			    classname: dataSetPrefix + dataset,
+			    id:recId,
+			    fields: obj,
+			    session_id:session_id // pass the freaking sessionId god dammit
+			};
+		//console.log(payload);
+		if (e.success){
+			ACS.Objects.update(payload, function (e) {
+			    if (e.success) {
+			        res.redirect('../../../databrowser/' + dataset);
+			    } else {
+			    	var response={message:((e.error && e.message) || JSON.stringify(e))}
+			        res.send(response);
+			    }
+			});
+		}
+	})
 }
