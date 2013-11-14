@@ -104,6 +104,10 @@
 <pre><code>http://yourhost/api/employees
 </code></pre>
 
+<p>The following diagram shows the anathomy of the URL "language":</p>
+
+<p><img src="http://s7.postimg.org/breh9gkmj/url_explained.png" alt="URL Explained"></p>
+
 <h3>
 <a name="adding-records" class="anchor" href="#adding-records"><span class="octicon octicon-link"></span></a>Adding records</h3>
 
@@ -120,8 +124,7 @@
 
 <p>To add this record to the employee <strong>dataset</strong>, simply <strong>POST</strong> the data via HTTP.  Data needs to be sent in a variable named <strong>data</strong>.</p>
 
-<pre><code>http://yourhost/api/employees/set
-
+<pre><code>curl -X POST -d 'data={"name": "Some Name", "email": "somename@emailthis.com"}' http://yourhost/api/yourdatasetname/set
 </code></pre>
 
 <h3>
@@ -129,8 +132,7 @@
 
 <p>Updating is similar to Adding, but simply call <strong>/edit</strong> and <strong>POST</strong> the variable <strong>id</strong> along with <strong>data</strong>, id being the id of the record to update.  Your record will be replaced with the newly posted one.</p>
 
-<pre><code>http://yourhost/api/employees/edit
-
+<pre><code>curl -X POST -d 'id=123456abc&amp;data={"name": "Some Name", "email": "somename@emailthis.com"}' http://yourhost/api/yourdatasetname/edit
 </code></pre>
 
 <h3>
@@ -138,8 +140,10 @@
 
 <p>To delete simply call <strong>/delete</strong> and <strong>POST</strong> the variable <strong>id</strong>, id being the id of the record to remove.  In case you wish to delete more than one record, sent the variable <strong>ids</strong> instead and all record ids separated by commas.</p>
 
-<pre><code>http://yourhost/api/employees/delete
+<pre><code>curl -X POST -d 'id=123456abc' http://yourhost/api/yourdatasetname/edit
+</code></pre>
 
+<pre><code>curl -X POST -d 'ids=123456abc,54321dcba' http://yourhost/api/yourdatasetname/edit
 </code></pre>
 
 <h2>
@@ -166,34 +170,36 @@
 
 <p><strong>Get all records from employees where department='Finance'</strong></p>
 
-<pre><code>http://yourhost/api/employees/get/department='Finance'
+<pre><code>curl http://yourhost/api/employees/get/department="Finance"
 </code></pre>
+
+<p>Note: If the string to search for has spaces, they need to be URL Encoded.</p>
 
 <p><strong>Get all employees ordered by name</strong></p>
 
-<pre><code>http://yourhost/api/employees/get/all/order/name
+<pre><code>curl http://yourhost/api/employees/get/all/order/name
 </code></pre>
 
 <p><strong>Get all employees ordered by name but only the id and name columns</strong></p>
 
-<pre><code>http://yourhost/api/employees/get/all/order/name/columns/id,name
+<pre><code>curl http://yourhost/api/employees/get/all/order/name/columns/id,name
 </code></pre>
 
 <p><strong>Get all employees where name='Ricardo' and order by creation date descending</strong></p>
 
-<pre><code>http://yourhost/api/employees/name="Ricardo"/order/-created_at
+<pre><code>curl http://yourhost/api/employees/get/name="Finance"/order/-created_at
 </code></pre>
 
 <p><strong>Get all employees where name="Ricardo" and department="Finance" order by creation date descending</strong></p>
 
-<pre><code>http://yourhost/api/employees/name="Ricardo",department="Finance"/order/-created_at
+<pre><code>curl http://yourhost/api/employees/get/name="Ricardo",department="Finance"/order/-created_at
 </code></pre>
 
 <p>Note: Allowed logical operators are: =, &gt;, &lt;, &gt;=, &lt;= and !=</p>
 
 <p><strong>Pagination : Previous example, but in pages of 10 records each</strong></p>
 
-<pre><code>http://yourhost/api/employees/name='Ricardo'/order/-created_at/per_page/10/page/1
+<pre><code>curl http://yourhost/api/employees/get/name="Ricardo"/order/-created_at/per_page/10/page/1
 </code></pre>
 
 <p><strong>NOTE</strong>
