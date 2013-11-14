@@ -31,7 +31,10 @@ function start(app, express) {
 	app.use(express.session({ key: 'node.acs', secret: ACS_SECRET }));
 	ACS.init(ACS_KEY,ACS_SECRET);
 
-	app.get('/api/*', function(req, res, next){
+	// use ACS Admin user as user for Basic Auth
+	var auth = express.basicAuth(encodeURIComponent(settings.ADMIN_UID), encodeURIComponent(settings.ADMIN_PWD));
+
+	app.get('/api/*',auth,function(req, res, next){
 		res.setHeader('Content-Type', 'application/json');
 		var fullPath=req.path.replace(/^\/|\/$/g,'').split('/');
 		if (fullPath.length >=3){
@@ -65,7 +68,7 @@ function start(app, express) {
 
 	// ##
 
-	app.post('/api/*', function(req, res, next){
+	app.post('/api/*',auth,function(req, res, next){
 		res.setHeader('Content-Type', 'application/json');
 		var fullPath=req.path.replace(/^\/|\/$/g,'').split('/');
 
