@@ -76,6 +76,11 @@ The next querystring parameter is the **dataset**, so if your **dataset** is emp
 http://yourhost/api/employees
 ```
 
+The following diagram shows the anathomy of the URL "language":
+
+![URL Explained](http://s7.postimg.org/breh9gkmj/url_explained.png)
+
+
 ### Adding records
 
 Records are added via HTTP Post.  Simply post a JavaScript Object in the **data** variable to http://yourhost/api/set.  For example:
@@ -93,8 +98,7 @@ Example object:
 To add this record to the employee **dataset**, simply **POST** the data via HTTP.  Data needs to be sent in a variable named **data**.
 
 ```
-http://yourhost/api/employees/set
-
+curl -X POST -d 'data={"name": "Some Name", "email": "somename@emailthis.com"}' http://yourhost/api/yourdatasetname/set
 ```
 
 ### Updating records
@@ -102,8 +106,7 @@ http://yourhost/api/employees/set
 Updating is similar to Adding, but simply call **/edit** and **POST** the variable **id** along with **data**, id being the id of the record to update.  Your record will be replaced with the newly posted one.
 
 ```
-http://yourhost/api/employees/edit
-
+curl -X POST -d 'id=123456abc&data={"name": "Some Name", "email": "somename@emailthis.com"}' http://yourhost/api/yourdatasetname/edit
 ```
 
 ### Deleting records
@@ -111,8 +114,11 @@ http://yourhost/api/employees/edit
 To delete simply call **/delete** and **POST** the variable **id**, id being the id of the record to remove.  In case you wish to delete more than one record, sent the variable **ids** instead and all record ids separated by commas.
 
 ```
-http://yourhost/api/employees/delete
+curl -X POST -d 'id=123456abc' http://yourhost/api/yourdatasetname/edit
+```
 
+```
+curl -X POST -d 'ids=123456abc,54321dcba' http://yourhost/api/yourdatasetname/edit
 ```
 
 ## Querying records
@@ -139,37 +145,40 @@ http://yourhost/api/employees/get/all
 **Get all records from employees where department='Finance'**
 
 ```
-http://yourhost/api/employees/get/department='Finance'
+curl http://yourhost/api/employees/get/department="Finance"
 ```
+Note: If the string to search for has spaces, they need to be URL Encoded.
+
+
 **Get all employees ordered by name**
 
 ```
-http://yourhost/api/employees/get/all/order/name
+curl http://yourhost/api/employees/get/all/order/name
 ```
 
 **Get all employees ordered by name but only the id and name columns**
 
 ```
-http://yourhost/api/employees/get/all/order/name/columns/id,name
+curl http://yourhost/api/employees/get/all/order/name/columns/id,name
 ```
 
 **Get all employees where name='Ricardo' and order by creation date descending**
 
 ```
-http://yourhost/api/employees/name="Ricardo"/order/-created_at
+curl http://yourhost/api/employees/get/name="Finance"/order/-created_at
 ```
 
 **Get all employees where name="Ricardo" and department="Finance" order by creation date descending**
 
 ```
-http://yourhost/api/employees/name="Ricardo",department="Finance"/order/-created_at
+curl http://yourhost/api/employees/get/name="Ricardo",department="Finance"/order/-created_at
 ```
 Note: Allowed logical operators are: =, >, <, >=, <= and !=
 
 **Pagination : Previous example, but in pages of 10 records each**
 
 ```
-http://yourhost/api/employees/name='Ricardo'/order/-created_at/per_page/10/page/1
+curl http://yourhost/api/employees/get/name="Ricardo"/order/-created_at/per_page/10/page/1
 ```
 
 **NOTE**
