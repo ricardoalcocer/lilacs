@@ -92,6 +92,14 @@
 <hr><p>Once you have LilACS running, your backend is ready to start receiving requests at http://your_domain:port/api/xxxxx.  </p>
 
 <h3>
+<a name="basic-auth" class="anchor" href="#basic-auth"><span class="octicon octicon-link"></span></a>Basic Auth</h3>
+
+<p>Lilacs uses Basic Auth to protect the endpoints.  The admin username and passwords you added to ACS and the lilacs.js file will be used as the valid user for all GET and POST requests.  This means that you need to add your Basic Auth credentials to the URL like so:</p>
+
+<pre><code>http://yourusername:yourpassword@yourhost/api
+</code></pre>
+
+<h3>
 <a name="the-basics" class="anchor" href="#the-basics"><span class="octicon octicon-link"></span></a>The basics</h3>
 
 <p>Records are added to <strong>datasets</strong>.  Your base url will allways be:</p>
