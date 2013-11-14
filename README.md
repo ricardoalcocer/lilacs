@@ -114,11 +114,11 @@ curl -X POST -d 'id=123456abc&data={"name": "Some Name", "email": "somename@emai
 To delete simply call **/delete** and **POST** the variable **id**, id being the id of the record to remove.  In case you wish to delete more than one record, sent the variable **ids** instead and all record ids separated by commas.
 
 ```
-curl -X POST -d 'id=123456abc' http://yourhost/api/yourdatasetname/edit
+curl -X POST -d 'id=123456abc' http://yourhost/api/yourdatasetname/delete
 ```
 
 ```
-curl -X POST -d 'ids=123456abc,54321dcba' http://yourhost/api/yourdatasetname/edit
+curl -X POST -d 'ids=123456abc,54321dcba' http://yourhost/api/yourdatasetname/delete
 ```
 
 ## Querying records
