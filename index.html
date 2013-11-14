@@ -1,43 +1,33 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8">
+    <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+
     <title>Lilacs by ricardoalcocer</title>
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script src="javascripts/respond.js"></script>
-    <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <!--[if lt IE 8]>
-    <link rel="stylesheet" href="stylesheets/ie.css">
-    <![endif]-->
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-
   </head>
+
   <body>
-      <div id="header">
-        <nav>
-          <li class="fork"><a href="https://github.com/ricardoalcocer/lilacs">View On GitHub</a></li>
-          <li class="downloads"><a href="https://github.com/ricardoalcocer/lilacs/zipball/master">ZIP</a></li>
-          <li class="downloads"><a href="https://github.com/ricardoalcocer/lilacs/tarball/master">TAR</a></li>
-          <li class="title">DOWNLOADS</li>
-        </nav>
-      </div><!-- end header -->
 
-    <div class="wrapper">
+    <header>
+      <div class="container">
+        <h1>Lilacs</h1>
+        <h2>An Instant database and REST API for your web and/or mobile apps.</h2>
 
-      <section>
-        <div id="title">
-          <h1>Lilacs</h1>
-          <p>An Instant database and REST API for your web and/or mobile apps.</p>
-          <hr>
-          <span class="credits left">Project maintained by <a href="https://github.com/ricardoalcocer">ricardoalcocer</a></span>
-          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
-        </div>
+        <section id="downloads">
+          <a href="https://github.com/ricardoalcocer/lilacs/zipball/master" class="btn">Download as .zip</a>
+          <a href="https://github.com/ricardoalcocer/lilacs/tarball/master" class="btn">Download as .tar.gz</a>
+          <a href="https://github.com/ricardoalcocer/lilacs" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
+        </section>
+      </div>
+    </header>
 
+    <div class="container">
+      <section id="main_content">
         <p></p><img src="https://raw.github.com/ricardoalcocer/lilacs/master/public/images/retro_flower_1_color_colour_lilac_peace-999px.png" width="200"><h1>
 <a name="lilacs-beta" class="anchor" href="#lilacs-beta"><span class="octicon octicon-link"></span></a>LilACS (Beta)</h1>
 
@@ -79,7 +69,7 @@
 <p>Open <strong>/lib/lilacs_template.js</strong> and add your ACS Keys and admin user info.  Save this file as <strong>/lib/lilacs.js</strong></p>
 
 <h2>
-<a name="6-launch-and-turn" class="anchor" href="#6-launch-and-turn"><span class="octicon octicon-link"></span></a>6. Launch and turn</h2>
+<a name="6-launch-and-run" class="anchor" href="#6-launch-and-run"><span class="octicon octicon-link"></span></a>6. Launch and run</h2>
 
 <ul>
 <li>From a terminal, go to your project folder and run it: </li>
@@ -88,7 +78,15 @@
 
 <ul>
 <li>Point your browser to http://localhost:8080.  LilACS should be running</li>
-</ul><hr><h1>
+</ul><h2>
+<a name="7-when-ready-to-publish" class="anchor" href="#7-when-ready-to-publish"><span class="octicon octicon-link"></span></a>7. When ready to publish</h2>
+
+<pre><code>$ acs publish --force
+</code></pre>
+
+<p>ACS will return a public URL for your API.</p>
+
+<hr><h1>
 <a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h1>
 
 <hr><p>Once you have LilACS running, your backend is ready to start receiving requests at http://your_domain:port/api/xxxxx.  </p>
@@ -201,6 +199,11 @@
 <p><strong>NOTE</strong>
 Querystring parameters are value pairs, for example when querying a page, the URL looks like <strong>/page/1</strong>, where page is the variable and 1 is the value.  In case a parameter can receive multiple values, they are separated by commas.</p>
 
+<h1>
+<a name="databrowser" class="anchor" href="#databrowser"><span class="octicon octicon-link"></span></a>Databrowser</h1>
+
+<p>A data browser is provided at http://yourhost/admin.  You can browse through your datasets, edit and delete data.</p>
+
 <hr><h1>
 <a name="stuff-to-do-and-in-the-works" class="anchor" href="#stuff-to-do-and-in-the-works"><span class="octicon octicon-link"></span></a>Stuff to-do and in-the-works</h1>
 
@@ -208,11 +211,6 @@ Querystring parameters are value pairs, for example when querying a page, the UR
 <a name="events" class="anchor" href="#events"><span class="octicon octicon-link"></span></a>Events</h2>
 
 <p>Mechanism for adding onSet, onEdit, onValidate, onDelete events.  Initial tests are located in the file <strong>/lib/lilacsevents</strong>.js</p>
-
-<h2>
-<a name="databrowser" class="anchor" href="#databrowser"><span class="octicon octicon-link"></span></a>Databrowser</h2>
-
-<p>Provide an admin insterface for adminsitering records and events.  Initial tests are located at http://yourhost/admin.</p>
 
 <hr><h1>
 <a name="contribuitors" class="anchor" href="#contribuitors"><span class="octicon octicon-link"></span></a>Contribuitors</h1>
@@ -226,9 +224,8 @@ Querystring parameters are value pairs, for example when querying a page, the UR
 
 <hr><p>Licensed under the terms of the MIT License | <a href="http://alco.mit-license.org/">http://alco.mit-license.org/</a></p>
       </section>
-
     </div>
-    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+
               <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
             document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
