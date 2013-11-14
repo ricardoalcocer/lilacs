@@ -78,7 +78,7 @@ http://yourhost/api/employees
 
 The following diagram shows the anathomy of the URL "language":
 
-![URL Explained](http://s7.postimg.org/breh9gkmj/url_explained.png)
+![URL Explained](http://s21.postimg.org/jt9yept47/url_explained.png)
 
 
 ### Adding records
