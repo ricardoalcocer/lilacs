@@ -140,10 +140,10 @@
 
 <p>To delete simply call <strong>/delete</strong> and <strong>POST</strong> the variable <strong>id</strong>, id being the id of the record to remove.  In case you wish to delete more than one record, sent the variable <strong>ids</strong> instead and all record ids separated by commas.</p>
 
-<pre><code>curl -X POST -d 'id=123456abc' http://yourhost/api/yourdatasetname/edit
+<pre><code>curl -X POST -d 'id=123456abc' http://yourhost/api/yourdatasetname/delete
 </code></pre>
 
-<pre><code>curl -X POST -d 'ids=123456abc,54321dcba' http://yourhost/api/yourdatasetname/edit
+<pre><code>curl -X POST -d 'ids=123456abc,54321dcba' http://yourhost/api/yourdatasetname/delete
 </code></pre>
 
 <h2>
