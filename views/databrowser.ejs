@@ -51,7 +51,11 @@ function editrec(id){
                 <% data.forEach(function(item){ %>
                     <tr>
                       <% for (var i=0;i<totalColumns;i++){ %>
-                        <td><a href="<%=dataset%>/edit/<%=item.id%>"><%= JSON.stringify(item[columns[i]])%></a></td>
+                          <% var thisData=String(item[columns[i]]); %>
+                              <% if (thisData.length > 100){ %>
+                                  <% thisData=thisData.substring(0,100); %>
+                              <% } %>
+                        <td><a href="<%=dataset%>/edit/<%=item.id%>"><%= JSON.stringify(thisData)%></a></td>
                       <% } %>
                       <td style="text-align: center">
                         <div class="btn-group btn-group-sm">
