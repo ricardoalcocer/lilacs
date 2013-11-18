@@ -37,12 +37,15 @@
                       <%= typeof thisrec[item] %> 
                       <% } %>)</b>
 
+                      <% if (tmp.length < 100) { %>
                       <input type="text" class="form-control" name="<%= item %>" id="<%= item %>" value="<%= tmp %>" 
-
                       <% if (item === 'id' || item === 'created_at' || item === 'updated_at') {%>
                         disabled />
                       <% }else{ %>
                         />
+                      <% } %>
+                      <% }else{ %>
+                      <textarea type="text" class="form-control" name="<%= item %>" id="<%= item %>" wrap="true" ><%= tmp %></textarea>
                       <% } %>
                     </div>
                     <% }) %>
