@@ -14,11 +14,6 @@ var _ = require('lodash');
 var settings=require('./lib/lilacs.js').getSettings();
 var parseActions=require('./lib/lilacsmod.js').parseActions;
 var _events=require('./lib/lilacsevents.js');
-
-var DS=require('./lib/datasources/lilacs_acs.js').lilacs_acs;
-var dataSource=new DS();   
-
-
 var dataSetPrefix='lilacsds_';
 
 // initialize app
@@ -51,8 +46,12 @@ function start(app, express) {
 					perpage: 	_.find(parsedActions,{'action': 'per_page'}).value,
 					limit: 		_.find(parsedActions,{'action': 'limit'}).value,
 					skip: 		_.find(parsedActions,{'action': 'skip'}).value,
-					columns: 	_.find(parsedActions,{'action': 'columns'}).value
+					columns: 	_.find(parsedActions,{'action': 'columns'}).value,
+					datasource: _.find(parsedActions,{'action': 'datasource'}).value
 				};
+
+				var DS=require('./lib/datasources/lilacs_' + (args.datasource !== null ? args.datasource :'acs') + '.js').lilacs_acs;
+				var dataSource=new DS();
 
 				dataSource.GET(collectionName,args,function(data){
 					res.send(data);
