@@ -97,7 +97,7 @@ Example object:
 ```
 {
 	name: 'Ricardo',
-	lname: 'Alcocer,
+	lname: 'Alcocer',
 	department: 'Finance'
 }
 ```
