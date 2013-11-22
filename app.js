@@ -50,7 +50,8 @@ function start(app, express) {
 					datasource: _.find(parsedActions,{'action': 'datasource'}).value
 				};
 
-				var DS=require('./lib/datasources/lilacs_' + (args.datasource !== null ? args.datasource :'acs') + '.js').lilacs_acs;
+				var dsName='lilacs_' + (args.datasource !== null ? args.datasource :'acs');
+				var DS=require('./lib/datasources/' + dsName + '.js')[dsName];
 				var dataSource=new DS();
 
 				dataSource.GET(collectionName,args,function(data){
