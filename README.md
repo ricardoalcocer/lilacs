@@ -7,6 +7,8 @@
 
 LilACS (Li'l ACS) is a combination of Node.ACS (to expose an API) + ACS (as a data store), that will provide you with an instant API for your mobile or web app.
 
+There's a demo video [here](http://ricardoalcocer.com/2014/04/lilacs/).
+
 ---
 # Installation
 ---
